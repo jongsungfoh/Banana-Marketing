@@ -21,7 +21,6 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
-import '../styles/combine-mode-switch.css';
 
 // Import custom node components
 import ProductNode from './flow-nodes/ProductNode';
@@ -87,7 +86,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
   const [isSaving, setIsSaving] = useState(false);
   const [isLoadingProject, setIsLoadingProject] = useState(false);
   const [isSavingCanvas, setIsSavingCanvas] = useState(false);
-  const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-tw'>('en-us');
+  const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-cn'>('en-us');
   const [projectNotFound, setProjectNotFound] = useState(false);
   
   // Combine Mode state
@@ -133,23 +132,24 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const productUploadRef = useRef<HTMLInputElement>(null);
+  const canvasLoadRef = useRef<HTMLInputElement>(null);
   const analysisScrollRef = useRef<HTMLDivElement>(null);
 
-  // 從 localStorage 讀取語系設定
+  // 从 localStorage 读取语言设定
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('language') as 'en-us' | 'zh-tw' | null;
+      const savedLanguage = localStorage.getItem('language') as 'en-us' | 'zh-cn' | null;
       if (savedLanguage) {
         setCurrentLanguage(savedLanguage);
       }
     }
   }, []);
 
-  // 監聽語系變化
+  // 监听语言变化
   useEffect(() => {
     const handleLanguageChange = () => {
       if (typeof window !== 'undefined') {
-        const savedLanguage = localStorage.getItem('language') as 'en-us' | 'zh-tw' | null;
+        const savedLanguage = localStorage.getItem('language') as 'en-us' | 'zh-cn' | null;
         if (savedLanguage) {
           setCurrentLanguage(savedLanguage);
         }
@@ -165,7 +165,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     };
   }, []);
 
-  // 翻譯對象
+  // 翻译对象
   const t = {
     'en-us': {
       uploadProduct: 'Upload Your Product',
@@ -186,24 +186,24 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       apiKeyRequired: 'API Key Required',
       pleaseEnterApiKey: 'Please enter your Gemini API Key in the header'
     },
-    'zh-tw': {
-      uploadProduct: '上傳產品照',
-      dragDropText: '拖曳或點擊選擇檔案',
-      aiCreativeStrategist: 'AI 創意策略師',
-      fileSupport: '支援 JPG, PNG，最大 10MB',
-      dropImageHere: '在這裡放置您的產品圖片...',
-      save: '儲存',
-      saving: '儲存中...',
+    'zh-cn': {
+      uploadProduct: '上传产品图片',
+      dragDropText: '拖拽或点击选择文件',
+      aiCreativeStrategist: 'AI 创意策略师',
+      fileSupport: '支持 JPG, PNG，最大 10MB',
+      dropImageHere: '在这里放置您的产品图片...',
+      save: '保存',
+      saving: '保存中...',
       analyzing: '分析中',
-      generationFailed: '生成失敗',
-      projectLoadFailed: '專案載入失敗',
-      analysisFailed: '分析失敗',
-      loadingProject: '載入專案中...',
-      projectNotFound: '找不到專案',
-      projectNotFoundMessage: '請求的專案不存在或您沒有權限存取。',
-      backToCampaigns: '回到活動',
-      apiKeyRequired: '需要 API Key',
-      pleaseEnterApiKey: '請在右上角輸入您的 Gemini API Key'
+      generationFailed: '生成失败',
+      projectLoadFailed: '项目加载失败',
+      analysisFailed: '分析失败',
+      loadingProject: '加载项目中...',
+      projectNotFound: '找不到项目',
+      projectNotFoundMessage: '请求的项目不存在或您没有访问权限。',
+      backToCampaigns: '返回活动',
+      apiKeyRequired: '需要 API 密钥',
+      pleaseEnterApiKey: '请在右上角输入您的 Gemini API 密钥'
     }
   };
 
@@ -310,7 +310,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     ));
   }, [setNodes]);
 
-  // 圖片生成
+  // 图片生成
   const executeGenerateImage = useCallback(async (conceptId: string) => {
     const apiKey = getApiKey();
     if (!apiKey) {
@@ -323,14 +323,14 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     
     if (!conceptNode) return;
 
-    // 更新概念節點狀態為 generating
+    // 更新概念节点状态为 generating
     setNodes(prev => prev.map(node => 
       node.id === conceptId 
         ? { ...node, data: { ...node.data, status: 'generating' } }
         : node
     ));
 
-    // 建立新的 creative 節點
+    // 创建新的 creative 节点
     const creativeNodeId = `creative-${Date.now()}`;
     const newNode: Node = {
       id: creativeNodeId,
@@ -344,7 +344,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         content: conceptNode.data.content,
         status: 'generating',
         concept: conceptNode.data.concept,
-        parentConceptId: conceptNode.id, // ✅ 設置父 Concept ID，用於追溯產品來源
+        parentConceptId: conceptNode.id, // ✅ 设置父 Concept ID，用于追溯产品来源
         onImageClick: stableHandleImageClick,
         onDeleteClick: stableHandleDeleteClick,
         onAddConcept: () => handleAddConceptFromCreative(creativeNodeId),
@@ -354,7 +354,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
 
     setNodes(prev => [...prev, newNode]);
 
-    // 建立連接線
+    // 创建连接线
     const newEdge: Edge = {
       id: `edge-${conceptId}-${creativeNodeId}`,
       source: conceptId,
@@ -367,21 +367,21 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     setEdges(prev => [...prev, newEdge]);
 
     try {
-      // 產品圖片：優先使用 parentProductImageUrl，否則使用第一個產品節點
+      // 产品图片：优先使用 parentProductImageUrl，否则使用第一个产品节点
       let productImagePath = '';
       if (conceptNode.data.parentProductImageUrl) {
-        // 如果 Concept 有記錄特定 Product，使用該 Product 的圖片
+        // 如果 Concept 有记录特定 Product，使用该 Product 的图片
         productImagePath = conceptNode.data.parentProductImageUrl;
       } else {
-        // 否則使用第一個產品節點（向後兼容）
+        // 否则使用第一个产品节点（向后兼容）
         const productNode = currentNodes.find((n: Node) => n.type === 'product');
         productImagePath = productNode?.data?.imageUrl || '';
       }
       
-      // 取得 parent Generated Node 的圖片路徑（如果存在）
+      // 取得 parent Generated Node 的图片路径（如果存在）
       const parentGeneratedImagePath = conceptNode.data.parentGeneratedImageUrl || '';
       
-      // 構建prompt，如果是知識圖譜節點則加入無文字指示
+      // 构建prompt，如果是知识图谱节点则加入无文字指示
       let finalPrompt = conceptNode.data.content;
       if (conceptNode.data.fromKnowledgeGraph) {
         finalPrompt += `\n\nImportant: The generated image content must not contain any text (including Chinese, English or other languages), please only use visual elements, images, symbols, no text content.`;
@@ -392,10 +392,10 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           concept: conceptNode.data.concept || conceptNode.data.title,
           prompt: finalPrompt
         },
-        product_image_path: productImagePath, // 智能選擇的產品圖片
-        generated_image_path: parentGeneratedImagePath, // 包含 parent Generated 圖片（如果存在）
+        product_image_path: productImagePath, // 智能选择的产品图片
+        generated_image_path: parentGeneratedImagePath, // 包含 parent Generated 图片（如果存在）
         size: '1:1',
-        language: currentLanguage === 'zh-tw' ? 'zh' : 'en',
+        language: currentLanguage === 'zh-cn' ? 'zh' : 'en',
         api_key: apiKey
       };
       
@@ -419,7 +419,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       const data = await response.json();
 
       if (data.success && data.image_url) {
-        // 更新 creative 節點
+        // 更新 creative 节点
         setNodes(prev => prev.map(node => 
           node.id === creativeNodeId 
             ? { 
@@ -434,7 +434,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
             : node
         ));
 
-        // 更新概念節點狀態
+        // 更新概念节点状态
         setNodes(prev => prev.map(node => 
           node.id === conceptId 
             ? { ...node, data: { ...node.data, status: 'completed' } }
@@ -443,7 +443,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
 
         console.log('Image generated successfully');
 
-        // 移除 justCompleted 標記
+        // 移除 justCompleted 标记
         setTimeout(() => {
           setNodes(prev => prev.map(node => 
             node.id === creativeNodeId 
@@ -452,13 +452,13 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           ));
         }, 3000);
       } else {
-        throw new Error(data.error || '生成失敗');
+        throw new Error(data.error || '生成失败');
       }
     } catch (error) {
-      console.error('生成圖片失敗:', error);
+      console.error('生成图片失败:', error);
       console.error('Generation failed');
 
-      // 更新狀態為錯誤
+      // 更新状态为错误
       setNodes(prev => prev.map(node => {
         if (node.id === creativeNodeId) {
           return { ...node, data: { ...node.data, status: 'error' } };
@@ -473,12 +473,12 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
 
   // Generate image function that calls executeGenerateImage
   const stableHandleGenerateImage = useCallback((conceptId: string) => {
-    // 直接生成圖片，跳過確認modal
+    // 直接生成图片，跳过确认modal
     console.log('🎨 Generating image directly without confirmation modal');
     executeGenerateImage(conceptId);
   }, [executeGenerateImage]);
 
-  // 從 Creative 節點新增概念
+  // 从 Creative 节点新增概念
   const handleAddConceptFromCreative = useCallback((creativeId: string) => {
     const creativeNode = nodesRef.current.find(n => n.id === creativeId);
     if (!creativeNode) return;
@@ -501,23 +501,23 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         inputHandleColor: '#187498',
         parentGeneratedId: creativeId,
         parentGeneratedImageUrl: creativeNode.data.imageUrl,
-        // 追溯原始 Product 圖片
+        // 追溯原始 Product 图片
         parentProductImageUrl: (() => {
-          // 追溯這個 Creative Node 來源於哪個 Product
-          // 1. 首先找到這個 Creative Node 的父 Concept
-          const currentNodes = nodesRef.current;
-          const parentConceptId = creativeNode.data.parentConceptId;
-          
-          if (parentConceptId) {
-            const parentConcept = currentNodes.find((n: Node) => n.id === parentConceptId);
-            if (parentConcept?.data?.parentProductImageUrl) {
-              // 使用父 Concept 追蹤的特定產品圖片
-              return parentConcept.data.parentProductImageUrl;
-            }
+          // 追溯这个 Creative Node 来源于哪个 Product
+        // 1. 首先找到这个 Creative Node 的父 Concept
+        const currentNodes = nodesRef.current;
+        const parentConceptId = creativeNode.data.parentConceptId;
+        
+        if (parentConceptId) {
+          const parentConcept = currentNodes.find((n: Node) => n.id === parentConceptId);
+          if (parentConcept?.data?.parentProductImageUrl) {
+            // 使用父 Concept 追踪的特定产品图片
+            return parentConcept.data.parentProductImageUrl;
           }
-          // 2. 回退邏輯：如果找不到特定產品，使用第一個產品節點
-          const productNode = currentNodes.find((n: Node) => n.type === 'product');
-          return productNode?.data?.imageUrl || '';
+        }
+        // 2. 回退逻辑：如果找不到特定产品，使用第一个产品节点
+        const productNode = currentNodes.find((n: Node) => n.type === 'product');
+        return productNode?.data?.imageUrl || '';
         })(),
         onImageClick: stableHandleImageClick,
         onEditClick: stableHandleEditClick,
@@ -674,7 +674,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
 
   // Create additional product flow (for Add Product button)
   const createAdditionalProductFlow = useCallback((analysis: ProductAnalysis, productImageUrl: string, fileName: string, position: { x: number, y: number }) => {
-    // 創建新的 Product 節點（使用指定位置）
+    // 创建新的 Product 节点（使用指定位置）
     const newProductId = `product-${Date.now()}`;
     const productNode: Node = {
       id: newProductId,
@@ -748,7 +748,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       },
     };
 
-    // 創建概念節點（基於新產品的位置）
+    // 创建概念节点（基于新产品的位置）
     const conceptNodes = analysis.creative_prompts.map((prompt, index) => ({
       id: `${newProductId}-concept-${index}`,
       type: 'concept',
@@ -773,7 +773,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       },
     }));
 
-    // 創建連接線
+    // 创建连接线
     const conceptEdges = analysis.creative_prompts.map((prompt, index) => ({
       id: `${newProductId}-concept-${index}`,
       source: newProductId,
@@ -788,7 +788,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       },
     }));
 
-    // 一次性添加所有節點和連接線
+    // 一次性添加所有节点和连接线
     setNodes(prev => {
       const newNodes = [...prev, productNode, ...conceptNodes];
       console.log('🔄 Adding nodes:', {
@@ -804,7 +804,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     console.log('✅ Additional product flow created');
   }, [setNodes, setEdges, stableHandleImageClick, stableHandleEditClick, stableHandleGenerateImage, stableHandleDeleteClick, stableHandleContentUpdate, stableHandleTitleUpdate]);
 
-  // 產品圖片上傳處理
+  // 产品图片上传处理
   const handleFileUpload = useCallback(async (file: File) => {
     const apiKey = getApiKey();
     if (!apiKey) {
@@ -814,14 +814,14 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
 
     setIsAnalyzing(true);
     setReasoningSteps([]);
-    setCurrentStep(-1); // 初始設為 -1，表示沒有步驟完成
+    setCurrentStep(-1); // 初始设为 -1，表示没有步骤完成
 
     try {
-      // 先將圖片轉換為 base64 以便立即顯示
+      // 先将图片转换为 base64 以便立即显示
       const reader = new FileReader();
       reader.onload = () => {
         const base64Image = reader.result as string;
-        setProductImagePath(base64Image); // 立即設定產品圖片路徑
+        setProductImagePath(base64Image); // 立即设定产品图片路径
       };
       reader.readAsDataURL(file);
 
@@ -838,7 +838,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       const data = await response.json();
 
       if (data.success) {
-        // 更新為 API 返回的圖片 URL（如果不同）
+        // 更新为 API 返回的图片 URL（如果不同）
         if (data.product_image_url) {
           setProductImagePath(data.product_image_url);
         }
@@ -849,42 +849,42 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           
           const simulateReasoning = (steps: AnalysisStep[]) => {
             console.log('🔧 Setting reasoning steps:', steps);
-            setReasoningSteps([...steps]); // 使用 spread operator 確保 React 檢測到狀態變化
-            setCurrentStep(-1); // 先設為 -1，確保所有步驟初始為未完成狀態
+            setReasoningSteps([...steps]); // 使用 spread operator 确保 React 检测到状态变化
+            setCurrentStep(-1); // 先设为 -1，确保所有步骤初始为未完成状态
             
             let stepIndex = 0;
             const showNextStep = () => {
               if (stepIndex < steps.length) {
                 console.log(`🎯 Showing step ${stepIndex + 1}/${steps.length}:`, steps[stepIndex]);
-                setCurrentStep(stepIndex); // 設置當前步驟
+                setCurrentStep(stepIndex); // 设置当前步骤
                 stepIndex++;
                 setTimeout(showNextStep, 1500); // Show each step for 1.5 seconds
               } else {
                 console.log('🏁 All reasoning steps completed');
-                // 推理步驟完成後，等3秒再關閉分析覆蓋層並創建節點
+                // 推理步骤完成后，等3秒再关闭分析覆蓋層并创建节点
                 setTimeout(() => {
-                  console.log('🎯 推理展示完成，準備創建節點...');
+                  console.log('🎯 推理展示完成，准备创建节点...');
                   // Create the initial flow with analysis data
                   const analysisData = {
                     summary: data.analysis || 'Product analyzed',
                     creative_prompts: data.creative_prompts || [],
                     reasoning_steps: data.reasoning_steps || []
                   };
-                  console.log('🎯 創建節點數據：', analysisData.creative_prompts);
+                  console.log('🎯 创建节点数据：', analysisData.creative_prompts);
                   createInitialFlow(analysisData, data.product_image_url || URL.createObjectURL(file), file.name);
-                  console.log('🎯 關閉分析覆蓋層');
-                  setIsAnalyzing(false); // 現在才關閉分析覆蓋層
+                  console.log('🎯 关闭分析覆盖层');
+                  setIsAnalyzing(false); // 现在才关闭分析覆盖层
                 }, 3000);
               }
             };
             
-            // 稍微延遲開始，確保 reasoningSteps 狀態已更新
+            // 稍微延迟开始，确保 reasoningSteps 状态已更新
             setTimeout(showNextStep, 100);
           };
           
           simulateReasoning(data.reasoning_steps);
         } else {
-          // 如果沒有推理步驟，直接創建節點
+          // 如果没有推理步骤，直接创建节点
           const analysisData = {
             summary: data.analysis || 'Product analyzed',
             creative_prompts: data.creative_prompts || [],
@@ -895,16 +895,16 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         }
       } else {
         console.error(data.error || 'Analysis failed');
-        setIsAnalyzing(false); // 只在錯誤時關閉
+        setIsAnalyzing(false); // 只在错误时关闭
       }
     } catch (error) {
-      console.error('分析產品失敗:', error);
+      console.error('分析产品失败:', error);
       console.error('Error analyzing product');
-      setIsAnalyzing(false); // 只在錯誤時關閉
+      setIsAnalyzing(false); // 只在错误时关闭
     }
   }, [currentLanguage, getApiKey, createInitialFlow]);
 
-  // 節點操作函數
+  // 节点操作函数
   const handleDeleteNode = useCallback((nodeId: string) => {
     setNodes(prev => prev.filter(node => node.id !== nodeId));
     setEdges(prev => prev.filter(edge => edge.source !== nodeId && edge.target !== nodeId));
@@ -984,7 +984,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     setEdges(prev => [...prev, newEdge]);
   }, [stableHandleGenerateImage, handleDeleteNode, handleContentUpdate, handleTitleUpdate]);
 
-  // 檔案處理
+  // 文件处理
   const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -1028,13 +1028,13 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       return;
     }
 
-    // 關閉 Modal 先
+    // 关闭 Modal 先
     setShowProductUpload(false);
     
-    // 計算新 Product 節點的位置 (在畫布內，避免重疊)
+    // 计算新 Product 节点的位置 (在画布内，避免重叠)
     const existingProductNodes = nodesRef.current.filter(n => n.type === 'product');
     const newPosition = {
-      x: 400 + (existingProductNodes.length * 500), // 在畫布中央，水平排列
+      x: 400 + (existingProductNodes.length * 500), // 在画布中央，水平排列
       y: 100
     };
     
@@ -1044,13 +1044,13 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       fileName: file.name
     });
 
-    // 調用完整的分析流程，但指定新位置
+    // 调用完整的分析流程，但指定新位置
     setIsAnalyzing(true);
     setReasoningSteps([]);
     setCurrentStep(-1);
 
     try {
-      // 先將圖片轉換為 base64 以便立即顯示
+      // 先将图片转换为 base64 以便立即显示
       const reader = new FileReader();
       reader.onload = () => {
         const base64Image = reader.result as string;
@@ -1071,7 +1071,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       const data = await response.json();
 
       if (data.success) {
-        // 更新為 API 返回的圖片 URL（如果不同）
+        // 更新为 API 返回的图片 URL（如果不同）
         if (data.product_image_url) {
           setProductImagePath(data.product_image_url);
         }
@@ -1097,7 +1097,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                 setTimeout(() => {
                   console.log('🎯 Creating additional product nodes...');
                   
-                  // 創建新的產品節點（使用計算好的位置）
+                  // 创建新的产品节点（使用计算好的位置）
                   const analysisData = {
                     summary: data.analysis || 'Product analyzed',
                     creative_prompts: data.creative_prompts || [],
@@ -1115,7 +1115,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           
           simulateReasoning(data.reasoning_steps);
         } else {
-          // 如果沒有推理步驟，直接創建節點
+          // 如果没有推理步骤，直接创建节点
           const analysisData = {
             summary: data.analysis || 'Product analyzed',
             creative_prompts: data.creative_prompts || [],
@@ -1129,13 +1129,13 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         setIsAnalyzing(false);
       }
     } catch (error) {
-      console.error('分析新產品失敗:', error);
+      console.error('分析新产品失败:', error);
       console.error('Error analyzing new product');
       setIsAnalyzing(false);
     }
   }, [currentLanguage, getApiKey, createAdditionalProductFlow]);
 
-  // Knowledge Graph 處理
+  // Knowledge Graph 处理
   const handleKnowledgeGraphNodeClick = useCallback((nodeData: GraphNode, insight?: NodeInsight) => {
     if (!productImagePath) {
       console.warn('Please upload product image first');
@@ -1160,7 +1160,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       },
       data: {
         title: nodeData.name,
-        content: insight?.summary || `基於知識圖譜節點：${nodeData.name}`,
+        content: insight?.summary || `基于知识图谱节点：${nodeData.name}`,
         concept: nodeData.name,
         status: 'idle',
         fromKnowledgeGraph: true,
@@ -1192,12 +1192,12 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     console.log(`Added concept: ${nodeData.name}`);
   }, [productImagePath, stableHandleGenerateImage, handleDeleteNode, handleContentUpdate, handleTitleUpdate]);
 
-  // 專案名稱編輯（開源版本移除儲存功能）
+  // 项目名称编辑（开源版本移除存储功能）
   const handleSaveProjectName = useCallback(() => {
     if (!tempName.trim()) return;
     setProjectName(tempName.trim());
     setIsEditingName(false);
-    // 開源版本不儲存到後端
+    // 开源版本不存储到后端
   }, [tempName]);
 
   const handleCancelProjectNameEdit = useCallback(() => {
@@ -1205,15 +1205,77 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
     setIsEditingName(false);
   }, [projectName]);
 
-  // 畫布儲存（開源版本顯示正式版功能提示）
-  const handleSaveCanvas = useCallback(() => {
-    setShowOfficialModal(true);
+  // Local save functionality
+  const handleSaveCanvas = useCallback(async () => {
+    if (nodes.length === 0) return;
+    
+    setIsSavingCanvas(true);
+    
+    try {
+      // Prepare data to save
+      const canvasData = {
+        projectName,
+        nodes,
+        edges,
+        timestamp: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      // Create blob and download
+      const blob = new Blob([JSON.stringify(canvasData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${projectName || 'untitled-project'}.banana`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      console.log('💾 Canvas saved locally');
+    } catch (error) {
+      console.error('❌ Save failed:', error);
+    } finally {
+      setIsSavingCanvas(false);
+    }
+  }, [nodes, edges, projectName]);
+
+  // Local load functionality
+  const handleLoadCanvas = useCallback(() => {
+    canvasLoadRef.current?.click();
   }, []);
 
-  // Combine Mode（開源版本顯示正式版功能提示）
-  const handleCombineModeToggle = useCallback(() => {
-    setShowOfficialModal(true);
-  }, []);
+  const handleLoadFile = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      // Validate data structure
+      if (!data.nodes || !data.edges) {
+        throw new Error('Invalid file format');
+      }
+      
+      // Load the data
+      if (data.projectName) {
+        setProjectName(data.projectName);
+      }
+      setNodes(data.nodes);
+      setEdges(data.edges);
+      
+      console.log('📂 Canvas loaded from file:', file.name);
+    } catch (error) {
+      console.error('❌ Load failed:', error);
+      alert(currentLanguage === 'zh-cn' ? '文件加载失败，请检查文件格式' : 'Failed to load file, please check the format');
+    }
+    
+    // Reset file input
+    if (event.target) {
+      event.target.value = '';
+    }
+  }, [currentLanguage]);
 
   return (
     <div
@@ -1244,6 +1306,14 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         className="hidden"
       />
 
+      <input
+        ref={canvasLoadRef}
+        type="file"
+        accept=".banana,.json"
+        onChange={handleLoadFile}
+        className="hidden"
+      />
+
       {/* Project Toolbar */}
       <div className="sticky top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between px-6 py-2">
@@ -1252,7 +1322,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           </div>
           
           <div className="flex-1 flex justify-center">
-            {/* 專案名稱編輯 - 開源版本保留但不儲存 */}
+            {/* 项目名称编辑 - 开源版本保留但不储存 */}
             {isEditingName ? (
               <div className="flex items-center gap-2 max-w-md">
                 <input
@@ -1319,38 +1389,38 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
           </div>
           
           <div className="flex-1 flex justify-end items-center gap-3">
-            {/* Combine Mode Switch */}
-            <div className="combine-mode-container">
-              <label className="combine-mode-label">
-                <span className="text-xs font-medium text-gray-600 mb-1.5 block text-center">
-                  {currentLanguage === 'zh-tw' ? '合併模式' : 'Combine Mode'}
-                </span>
-                  <div className="combine-switch">
-                    <input
-                      type="checkbox"
-                      className="combine-togglesw" 
-                      checked={combineMode}
-                      onChange={handleCombineModeToggle}
-                    />
-                  <div className="combine-indicator left"></div>
-                  <div className="combine-indicator right"></div>
-                  <div className="combine-button"></div>
+            {/* Load Button */}
+            <div className="neu-button-container">
+              <div className="neu-button-label">
+                {currentLanguage === 'zh-cn' ? '加载' : 'Load'}
+              </div>
+              <button
+                onClick={handleLoadCanvas}
+                className="neu-button"
+                title={currentLanguage === 'zh-cn' ? '从文件加载项目' : 'Load project from file'}
+              >
+                <div className="neu-button-outer">
+                  <div className="neu-button-inner">
+                    <svg className="neu-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                  </div>
                 </div>
-              </label>
+              </button>
             </div>
 
             {/* Add Product Button */}
             <div className="neu-button-container">
               <div className="neu-button-label">
-                {currentLanguage === 'zh-tw' ? '新增產品' : 'Add Product'}
+                {currentLanguage === 'zh-cn' ? '新增产品' : 'Add Product'}
               </div>
               <button
                 onClick={() => setShowProductUpload(true)}
                 disabled={isUploadingProduct || !analysisComplete}
                 className="neu-button"
                 title={!analysisComplete 
-                  ? (currentLanguage === 'zh-tw' ? '請先上傳並分析產品圖片' : 'Please upload and analyze product image first')
-                  : (currentLanguage === 'zh-tw' ? '新增產品圖片' : 'Add Product Image')
+                  ? (currentLanguage === 'zh-cn' ? '请先上传并分析产品图片' : 'Please upload and analyze product image first')
+                  : (currentLanguage === 'zh-cn' ? '新增产品图片' : 'Add Product Image')
                 }
               >
                 <div className="neu-button-outer">
@@ -1367,16 +1437,16 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
               </button>
             </div>
 
-            {/* Save Button - 開源版本顯示但無功能 */}
+            {/* Save Button */}
             <div className="neu-button-container">
               <div className="neu-button-label">
-                {isSavingCanvas ? (currentLanguage === 'zh-tw' ? '儲存中...' : 'Saving...') : (currentLanguage === 'zh-tw' ? '儲存' : 'Save')}
+                {isSavingCanvas ? (currentLanguage === 'zh-cn' ? '保存中...' : 'Saving...') : (currentLanguage === 'zh-cn' ? '保存' : 'Save')}
               </div>
               <button
                 onClick={handleSaveCanvas}
                 disabled={isSavingCanvas || nodes.length === 0}
                 className="neu-button primary"
-                title={currentLanguage === 'zh-tw' ? '開源版本不支援儲存' : 'Save not supported in open source version'}
+                title={currentLanguage === 'zh-cn' ? '保存项目到文件' : 'Save project to file'}
               >
                 <div className="neu-button-outer">
                   <div className="neu-button-inner">
@@ -1486,7 +1556,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                   </div>
                 )}
                 
-                {/* 顯示所有分析步驟，無論是否完成 */}
+                {/* 显示所有分析步骤，无论是否完成 */}
                 {reasoningSteps.length > 0 ? (
                   reasoningSteps.map((step, index) => {
                     console.log(`🎨 Rendering step ${index + 1}:`, step, 'Current step:', currentStep);
@@ -1541,7 +1611,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                     );
                   })
                 ) : (
-                  /* 如果還沒有步驟，顯示載入中的佔位符 */
+                  /* 如果还没有步骤，显示加载中的占位符 */
                   <div className="space-y-4">
                     {[1, 2, 3, 4, 5].map((num) => (
                       <div key={num} className="p-4 rounded-lg border-l-4 bg-gray-50 border-gray-300 opacity-50 animate-pulse">
@@ -1588,7 +1658,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         </ReactFlow>
       </div>
 
-      {/* 圖片預覽 Modal */}
+      {/* 图片预览 Modal */}
       <AnimatePresence>
         {previewImage && (
           <motion.div
@@ -1644,11 +1714,11 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                   <h3 className="text-2xl font-bold text-gray-800 mb-2">
-                    {currentLanguage === 'zh-tw' ? '新增產品照片' : 'Add Product Image'}
+                    {currentLanguage === 'zh-cn' ? '新增产品图片' : 'Add Product Image'}
                   </h3>
                   <p className="text-gray-600">
-                    {currentLanguage === 'zh-tw' 
-                      ? '選擇要新增的產品照片' 
+                    {currentLanguage === 'zh-cn' 
+                      ? '选择要新增的产品图片' 
                       : 'Select product image to add'
                     }
                   </p>
@@ -1671,13 +1741,13 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <p className="text-gray-600 mb-2">
-                    {currentLanguage === 'zh-tw' 
-                      ? '拖放圖片到此處或點擊上傳' 
+                    {currentLanguage === 'zh-cn' 
+                      ? '拖放图片到此处或点击上传' 
                       : 'Drag & drop image here or click to upload'
                     }
                   </p>
                   <p className="text-sm text-gray-500">
-                    {currentLanguage === 'zh-tw' 
+                    {currentLanguage === 'zh-cn' 
                       ? '支援 JPG, PNG，最大 10MB' 
                       : 'Supports JPG, PNG • Max 10MB'
                     }
@@ -1691,7 +1761,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                     disabled={isUploadingProduct}
                     className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {currentLanguage === 'zh-tw' ? '取消' : 'Cancel'}
+                    {currentLanguage === 'zh-cn' ? '取消' : 'Cancel'}
                   </button>
                   <button
                     onClick={() => productUploadRef.current?.click()}
@@ -1705,7 +1775,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                       </svg>
                     )}
-                    {currentLanguage === 'zh-tw' ? '選擇檔案' : 'Choose File'}
+                    {currentLanguage === 'zh-cn' ? '选择文件' : 'Choose File'}
                   </button>
                 </div>
 

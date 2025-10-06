@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 interface OfficialVersionModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentLanguage: 'en-us' | 'zh-tw';
+  currentLanguage: 'en-us' | 'zh-cn';
 }
 
 export default function OfficialVersionModal({ isOpen, onClose, currentLanguage }: OfficialVersionModalProps) {
@@ -25,18 +25,18 @@ export default function OfficialVersionModal({ isOpen, onClose, currentLanguage 
       closeButton: 'Continue with Open Source',
       officialUrl: 'https://banana.thepocket.company/'
     },
-    'zh-tw': {
+    'zh-cn': {
       title: '正式版功能',
       description: '此功能在 Banana Editor 正式版中提供。',
       features: [
-        '雲端儲存與專案管理',
-        '團隊協作功能',
-        '進階 AI 模型與更快處理速度',
-        '專業範本與素材庫',
-        '優先客戶支援'
+        '云端存储与项目管理',
+        '团队协作功能',
+        '进阶 AI 模型与更快处理速度',
+        '专业模板与素材库',
+        '优先客户支持'
       ],
       visitOfficial: '前往正式版',
-      closeButton: '繼續使用開源版',
+      closeButton: '继续使用开源版',
       officialUrl: 'https://banana.thepocket.company/'
     }
   };
@@ -83,7 +83,7 @@ export default function OfficialVersionModal({ isOpen, onClose, currentLanguage 
               {/* Features List */}
               <div className="text-left mb-8">
                 <h4 className="font-semibold text-gray-800 mb-3">
-                  {currentLanguage === 'zh-tw' ? '正式版功能：' : 'Official Version Features:'}
+                  {currentLanguage === 'zh-cn' ? '正式版功能：' : 'Official Version Features:'}
                 </h4>
                 <ul className="space-y-2">
                   {t[currentLanguage].features.map((feature, index) => (

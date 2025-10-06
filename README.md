@@ -1,8 +1,6 @@
-# 🍌 Banana Split - Open Source
+# 🍌 Banana Marketing
 
-Open-source AI creative editor - Bring your own Gemini API Key
-
-🌐 **Official Version**: [https://banana.thepocket.company/](https://banana.thepocket.company/)
+AI creative editor - Bring your own Gemini API Key
 
 ## 🚀 Quick Start
 
@@ -31,7 +29,7 @@ Visit http://localhost:3003
 - ✅ **Knowledge Graph (Sample)**
 - ✅ **Node Drag & Connect**
 - ✅ **Neumorphism UI**
-- ✅ **Combine Mode** *(Full functionality in [Official Version](https://banana.thepocket.company/))*
+- ✅ **Save/Load Projects** *(Save to .banana files, load from .banana/.json)*
 - ✅ **Bilingual Support (EN/ZH)**
 - ✅ **Fully Local** *(Official Version provides cloud storage)*
 
@@ -45,7 +43,8 @@ Visit http://localhost:3003
 
 ## ⚠️ Important Notes
 
-- All data disappears after F5 refresh
+- Project data can be saved/loaded using Save/Load buttons
+- Generated images disappear after refresh (save project to preserve)
 - Images are not saved to cloud
 - Data processed only in memory
 
@@ -89,19 +88,24 @@ After upload, AI will automatically:
 - **Delete**: Click delete button on node
 - **Preview Image**: Click image to view full size
 
+### 8. Save/Load Projects
+- **Save Project**: Click "Save" button to export current canvas as .banana file
+- **Load Project**: Click "Load" button to import .banana or .json files
+- **File Format**: .banana files contain all nodes, edges, and project data
+- **Compatibility**: Supports loading from .banana and .json formats
+
 ## 💾 Data Storage
 
 ### Local Storage Features
 - ✅ API Key: Stored in localStorage (persistent)
 - ✅ Language Setting: Stored in localStorage (persistent)
-- ❌ Project Data: Memory only
-- ❌ Node Configuration: Memory only
+- ✅ Save/Load Projects: Export/import .banana files with all nodes and edges
 - ❌ Generated Images: Memory only (base64 format)
 
 ### After F5 Refresh
 - API Key and language settings **will be retained**
-- All project data and images **will disappear**
-- Need to re-upload product images
+- Project data **can be saved/loaded** using Save/Load buttons
+- Generated images **will disappear** (save project to preserve)
 
 ## 🐛 Troubleshooting
 
@@ -146,11 +150,9 @@ When using this software, you must:
 
 ---
 
-# 🍌 Banana Split - 開源版本
+# 🍌 Banana Marketing
 
-AI 創意編輯器開源版本 - 使用您自己的 Gemini API Key
-
-🌐 **正式版網站**: [https://banana.thepocket.company/](https://banana.thepocket.company/)
+AI 創意編輯器 - 使用您自己的 Gemini API Key
 
 ## 🚀 快速開始
 
@@ -179,9 +181,9 @@ npm run dev
 - ✅ **知識圖譜功能(範例)**
 - ✅ **節點拖拽和連接**
 - ✅ **Neumorphism UI**
-- ✅ **Combine Mode** *([正式版](https://banana.thepocket.company/)提供完整功能)*
+- ✅ **儲存/載入專案** *(儲存為 .banana 檔案，可載入 .banana/.json)*
 - ✅ **雙語系支援（中/英）**
-- ✅ **完全本地運行** *(正式版提供雲端儲存)*
+- ✅ **完全本地運行**
 
 ## 📝 如何取得 Gemini API Key
 
@@ -193,7 +195,8 @@ npm run dev
 
 ## ⚠️ 注意事項
 
-- F5 刷新後所有資料會消失
+- 專案資料可使用儲存/載入按鈕進行儲存/載入
+- 生成圖片刷新後會消失（儲存專案以保留）
 - 圖片不會儲存到雲端
 - 僅在記憶體中處理資料
 
@@ -237,26 +240,26 @@ npm run dev
 - **刪除**：點擊節點上的刪除按鈕（有子節點時會提示）
 - **預覽圖片**：點擊圖片查看大圖
 
+### 8. 儲存/載入專案
+- **儲存專案**：點擊「儲存」按鈕匯出目前畫布為 .banana 檔案
+- **載入專案**：點擊「載入」按鈕匯入 .banana 或 .json 檔案
+- **檔案格式**：.banana 檔案包含所有節點、連接和專案資料
+- **相容性**：支援從 .banana 和 .json 格式載入
+
 ## 💾 資料儲存說明
 
 ### 本地儲存特性
 - ✅ API Key：儲存在 localStorage（持久化）
 - ✅ 語言設定：儲存在 localStorage（持久化）
-- ❌ 專案資料：僅存在記憶體中
-- ❌ 節點配置：僅存在記憶體中
+- ✅ 儲存/載入專案：匯出/匯入 .banana 檔案包含所有節點和連接
 - ❌ 生成圖片：僅存在記憶體中（base64 格式）
 
 ### F5 刷新後
 - API Key 和語言設定**會保留**
-- 所有專案資料和圖片**會消失**
-- 需要重新上傳產品圖片
+- 專案資料**可儲存/載入**使用儲存/載入按鈕
+- 生成圖片**會消失**（儲存專案以保留）
 
-### 匯出資料
-如需保存工作：
-1. 對生成的圖片點右鍵 → 另存新檔
-2. Hover 創意節點 → 點擊下載按鈕（帶浮水印）
-3. 截圖保存畫布配置
-4. 複製概念文字到文件
+
 
 ## 🐛 常見問題
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 
-// 內嵌樣式定義
+// 内嵌样式定义
 const styles = `
   /* Glass morphism effect */
   .kg-glass {
@@ -59,7 +59,7 @@ const styles = `
   }
 `;
 
-// 節點介面定義
+// 节点接口定义
 export interface GraphNode extends d3.SimulationNodeDatum {
   id: string
   name: string
@@ -69,7 +69,7 @@ export interface GraphNode extends d3.SimulationNodeDatum {
   trending: boolean
 }
 
-// 連結介面定義
+// 链接接口定义
 export interface GraphLink {
   source: string
   target: string
@@ -77,33 +77,33 @@ export interface GraphLink {
   relation: string
 }
 
-// 圖表數據介面
+// 图表数据接口
 export interface GraphData {
   nodes: GraphNode[]
   links: GraphLink[]
 }
 
-// 洞察介面定義
+// 洞察接口定义
 export interface NodeInsight {
   summary: string
   sentiment: string
   keyPoints: string[]
 }
 
-// 創意模板介面
+// 创意模板接口
 export interface CreativeTemplate {
   concept: string
   description: string
   style: string
 }
 
-// 組件 Props 介面
+// 组件 Props 接口
 export interface KnowledgeGraphProps {
   isVisible: boolean
   onClose: () => void
   onNodeClick: (nodeData: GraphNode, insight?: NodeInsight) => void
   
-  // 可配置屬性（全部可選，有KFC默認值）
+  // 可配置属性（全部可选，有KFC默认值）
   title?: string
   subtitle?: string
   data?: GraphData
@@ -113,21 +113,21 @@ export interface KnowledgeGraphProps {
   width?: number
   height?: number
   
-  // 統計數據配置
+  // 统计数据配置
   stats?: {
     label: string
     value: string | number
     color?: string
   }[]
   
-  // 圖例配置
+  // 图例配置
   legend?: {
     category: string
     label: string
     color: string
   }[]
   
-  // 語言配置
+  // 语言配置
   language?: {
     title: string
     subtitle: string
@@ -150,280 +150,280 @@ export interface KnowledgeGraphProps {
   }
 }
 
-// KFC 專用創意模板
+// KFC 专用创意模板
 export const kfcCreativeTemplates: Record<string, CreativeTemplate> = {
-  "韓式起司脆雞飯": {
-    concept: "韓式風味饗宴",
-    description: "展示韓式起司脆雞飯的誘人起司拉絲效果，搭配韓式辣醬的火紅色澤，營造正宗韓式料理氛圍",
-    style: "韓式美食攝影風格，暖色調燈光，突出起司拉絲瞬間"
+  "韩式起司脆鸡饭": {
+    concept: "韩式风味盛宴",
+    description: "展示韩式起司脆鸡饭的诱人起司拉丝效果，搭配韩式辣酱的火红色泽，营造正宗韩式料理氛围",
+    style: "韩式美食摄影风格，暖色调灯光，突出起司拉丝瞬间"
   },
-  "爆漿卡士達蛋撻": {
-    concept: "爆漿驚喜時刻", 
-    description: "捕捉蛋撻被咬開瞬間，卡士達內餡流淌而出的驚艷畫面，傳達爆漿帶來的味覺驚喜",
-    style: "特寫微距攝影，金黃色澤，突出流動質感"
+  "爆浆卡士达蛋挞": {
+    concept: "爆浆惊喜时刻", 
+    description: "捕捉蛋挞被咬开瞬间，卡士达内馅流淌而出的惊艳画面，传达爆浆带来的味觉惊喜",
+    style: "特写微距摄影，金黄色泽，突出流动质感"
   },
-  "經典炸雞": {
-    concept: "11種香料傳奇",
-    description: "展現炸雞外酥內嫩的完美質感，搭配神秘香料氛圍，強調肯德基獨家配方的傳奇地位",
-    style: "經典美食攝影，溫暖燈光，突出酥脆質感"
+  "经典炸鸡": {
+    concept: "11种香料传奇",
+    description: "展现炸鸡外酥内嫩的完美质感，搭配神秘香料氛围，强调肯德基独家配方的传奇地位",
+    style: "经典美食摄影，温暖灯光，突出酥脆质感"
   },
   "家庭聚餐": {
-    concept: "溫馨分享時光",
-    description: "展現家人圍桌分享炸雞的溫馨畫面，突出肯德基在家庭重要時刻的陪伴價值",
-    style: "溫馨家庭攝影風格，自然燈光，強調情感連結"
+    concept: "温馨分享时光",
+    description: "展现家人围桌分享炸鸡的温馨画面，突出肯德基在家庭重要时刻的陪伴价值",
+    style: "温馨家庭摄影风格，自然灯光，强调情感连接"
   },
-  "韓流追星族": {
-    concept: "K-Culture美食體驗",
-    description: "結合韓流文化元素，展現年輕人享用韓式起司脆雞飯的時尚生活方式",
-    style: "時尚生活攝影，活力色彩，突出年輕潮流感"
+  "韩流追星族": {
+    concept: "K-Culture美食体验",
+    description: "结合韩流文化元素，展现年轻人享用韩式起司脆鸡饭的时尚生活方式",
+    style: "时尚生活摄影，活力色彩，突出年轻潮流感"
   },
-  "下午茶時光": {
-    concept: "悠閒午後享受",
-    description: "展現蛋撻配茶的精緻下午茶時光，營造放鬆愉悅的休閒氛圍",
-    style: "精緻生活攝影風格，柔和燈光，突出悠閒感"
+  "下午茶时光": {
+    concept: "悠闲午后享受",
+    description: "展现蛋挞配茶的精致下午茶时光，营造放松愉悦的休闲氛围",
+    style: "精致生活摄影风格，柔和灯光，突出悠闲感"
   }
 }
 
-// KFC 節點顏色映射
+// KFC 节点颜色映射
 export const kfcColorMap = {
-  "brand": "#e74c3c",           // 品牌核心 - 紅色
-  "hot_product": "#ff6b9d",     // 熱點新品 - 粉紅色 
-  "core_product": "#f39c12",    // 經典產品 - 橙色
-  "marketing_event": "#8e44ad",  // 行銷事件 - 紫色
-  "usage_scenario": "#16a085",   // 使用場景 - 青綠色
-  "purchase_channel": "#795548", // 購買管道 - 棕色
-  "service_issue": "#e67e22",    // 服務問題 - 橙紅色
-  "consumer_group": "#3498db"    // 消費族群 - 藍色
+  "brand": "#e74c3c",           // 品牌核心 - 红色
+  "product": "#f39c12",         // 产品节点 - 橙色  
+  "concept": "#3498db",        // 概念节点 - 蓝色
+  "creative": "#9b59b6",       // 创意节点 - 紫色
+  "target": "#2ecc71",         // 目标受众 - 绿色
+  "competitor": "#95a5a6",     // 竞品 - 灰色
+  "trend": "#1abc9c",          // 趋势 - 青色
+  "insight": "#e67e22"         // 洞察 - 深橙色
 }
 
-// 通用預設顏色映射 
+// 通用预设颜色映射 
 const defaultColorMap = {
-  "primary": "#e74c3c",      // 主要 - 紅色
-  "secondary": "#ff6b9d",    // 次要 - 粉紅色 
+  "primary": "#e74c3c",      // 主要 - 红色
+  "secondary": "#ff6b9d",    // 次要 - 粉红色 
   "success": "#f39c12",      // 成功 - 橙色
-  "info": "#8e44ad",         // 資訊 - 紫色
-  "warning": "#16a085",      // 警告 - 青綠色
-  "danger": "#795548",       // 危險 - 棕色
-  "light": "#e67e22",        // 淺色 - 橙紅色
-  "dark": "#3498db"          // 深色 - 藍色
+  "info": "#8e44ad",         // 信息 - 紫色
+  "warning": "#16a085",      // 警告 - 青绿色
+  "danger": "#795548",       // 危险 - 棕色
+  "light": "#e67e22",        // 浅色 - 橙红色
+  "dark": "#3498db"          // 深色 - 蓝色
 }
 
-// KFC 專用統計數據
+// KFC 专用统计数据
 export const kfcStats = [
-  { label: "總節點數", value: 26, color: "#f87171" },
-  { label: "總連結數", value: 35, color: "#f87171" },
-  { label: "真實討論", value: 1237, color: "#f87171" },
-  { label: "正面評價率", value: "87%", color: "#10b981" },
-  { label: "2025熱點新品", value: 6, color: "#facc15" }
+  { label: "总节点数", value: 26, color: "#f87171" },
+  { label: "总链接数", value: 35, color: "#f87171" },
+  { label: "真实讨论", value: 1237, color: "#f87171" },
+  { label: "正面评价率", value: "87%", color: "#10b981" },
+  { label: "2025热点新品", value: 6, color: "#facc15" }
 ]
 
-// KFC 專用圖例
+// KFC 专用图例
 export const kfcLegend = [
   { category: "brand", label: "品牌核心", color: "#e74c3c" },
-  { category: "hot_product", label: "熱點新品", color: "#ff6b9d" },
-  { category: "core_product", label: "經典產品", color: "#f39c12" },
-  { category: "consumer_group", label: "消費族群", color: "#3498db" },
-  { category: "usage_scenario", label: "使用場景", color: "#16a085" },
-  { category: "marketing_event", label: "行銷事件", color: "#8e44ad" },
-  { category: "purchase_channel", label: "購買管道", color: "#795548" },
-  { category: "service_issue", label: "服務問題", color: "#e67e22" }
+  { category: "hot_product", label: "热点新品", color: "#ff6b9d" },
+  { category: "core_product", label: "经典产品", color: "#f39c12" },
+  { category: "consumer_group", label: "消费族群", color: "#3498db" },
+  { category: "usage_scenario", label: "使用场景", color: "#16a085" },
+  { category: "marketing_event", label: "营销事件", color: "#8e44ad" },
+  { category: "purchase_channel", label: "购买渠道", color: "#795548" },
+  { category: "service_issue", label: "服务问题", color: "#e67e22" }
 ]
 
-// KFC 專用語言配置
+// KFC 专用语言配置
 export const kfcLanguage = {
-  title: "肯德基輿情知識圖譜",
-  subtitle: "基於1237則真實討論的AI深度分析 • 點擊節點生成對應廣告素材",
-  nodesTotalLabel: "總節點數",
-  linksTotalLabel: "總連結數",
+  title: "肯德基舆情知识图谱",
+  subtitle: "基于1237则真实讨论的AI深度分析 • 点击节点生成对应广告素材",
+  nodesTotalLabel: "总节点数",
+  linksTotalLabel: "总链接数",
   mentionsLabel: "次提及",
-  sentimentLabel: "情感傾向",
+  sentimentLabel: "情感倾向",
   insightsLabel: "深度洞察",
-  keyPointsLabel: "關鍵要點",
-  templatesLabel: "創意模板預覽",
+  keyPointsLabel: "关键要点",
+  templatesLabel: "创意模板预览",
   conceptLabel: "概念",
   descriptionLabel: "描述",
-  styleLabel: "風格",
-  generateButtonLabel: "生成廣告素材",
-  instructionText: "💡 點擊任意節點可基於輿情洞察自動生成對應的廣告創意素材",
-  legendTitle: "圖例",
+  styleLabel: "风格",
+  generateButtonLabel: "生成广告素材",
+  instructionText: "💡 点击任意节点可基于舆情洞察自动生成对应的广告创意素材",
+  legendTitle: "图例",
   positiveLabel: "😊 正面",
-  negativeLabel: "😔 負面",
+  negativeLabel: "😔 负面",
   neutralLabel: "😐 中性"
 }
 
-// 預設語言配置
+// 默认语言配置
 const defaultLanguage = {
-  title: "知識圖譜",
-  subtitle: "基於數據分析的深度洞察 • 點擊節點查看詳細資訊",
-  nodesTotalLabel: "總節點數",
-  linksTotalLabel: "總連結數", 
+  title: "知识图谱",
+  subtitle: "基于数据分析的深度洞察 • 点击节点查看详细信息",
+  nodesTotalLabel: "总节点数",
+  linksTotalLabel: "总链接数", 
   mentionsLabel: "次提及",
-  sentimentLabel: "情感傾向",
+  sentimentLabel: "情感倾向",
   insightsLabel: "深度洞察",
-  keyPointsLabel: "關鍵要點",
-  templatesLabel: "創意模板預覽",
+  keyPointsLabel: "关键要点",
+  templatesLabel: "创意模板预览",
   conceptLabel: "概念",
   descriptionLabel: "描述",
-  styleLabel: "風格",
-  generateButtonLabel: "生成內容",
-  instructionText: "💡 點擊任意節點可查看詳細洞察分析",
-  legendTitle: "圖例",
+  styleLabel: "风格",
+  generateButtonLabel: "生成内容",
+  instructionText: "💡 点击任意节点可查看详细洞察分析",
+  legendTitle: "图例",
   positiveLabel: "😊 正面",
-  negativeLabel: "😔 負面",
+  negativeLabel: "😔 负面",
   neutralLabel: "😐 中性"
 }
 
-// KFC 2025年輿情知識圖譜數據
+// KFC 2025年舆情知识图谱数据
 export const kfcGraphData: GraphData = {
   nodes: [
-    // 品牌節點
+    // 品牌节点
     {id: "肯德基", name: "肯德基", category: "brand", mentions: 1237, sentiment: "positive", trending: true},
     
-    // 2025年熱點新品
-    {id: "韓式起司脆雞飯", name: "韓式起司脆雞飯", category: "hot_product", mentions: 87, sentiment: "positive", trending: true},
-    {id: "爆漿卡士達蛋撻", name: "爆漿卡士達蛋撻", category: "hot_product", mentions: 64, sentiment: "positive", trending: true},
-    {id: "明太子無骨脆雞", name: "明太子無骨脆雞", category: "hot_product", mentions: 45, sentiment: "positive", trending: true},
+    // 2025年热点新品
+    {id: "韩式起司脆鸡饭", name: "韩式起司脆鸡饭", category: "hot_product", mentions: 87, sentiment: "positive", trending: true},
+    {id: "爆浆卡士达蛋挞", name: "爆浆卡士达蛋挞", category: "hot_product", mentions: 64, sentiment: "positive", trending: true},
+    {id: "明太子无骨脆鸡", name: "明太子无骨脆鸡", category: "hot_product", mentions: 45, sentiment: "positive", trending: true},
     {id: "青花椒香麻系列", name: "青花椒香麻系列", category: "hot_product", mentions: 38, sentiment: "positive", trending: true},
     
-    // 經典產品
-    {id: "經典炸雞", name: "經典炸雞", category: "core_product", mentions: 176, sentiment: "positive", trending: true},
-    {id: "原味蛋撻", name: "原味蛋撻", category: "core_product", mentions: 89, sentiment: "positive", trending: true},
-    {id: "上校雞塊", name: "上校雞塊", category: "core_product", mentions: 52, sentiment: "positive", trending: true},
+    // 经典产品
+    {id: "经典炸鸡", name: "经典炸鸡", category: "core_product", mentions: 176, sentiment: "positive", trending: true},
+    {id: "原味蛋挞", name: "原味蛋挞", category: "core_product", mentions: 89, sentiment: "positive", trending: true},
+    {id: "上校鸡块", name: "上校鸡块", category: "core_product", mentions: 52, sentiment: "positive", trending: true},
     
-    // 行銷事件
-    {id: "黑白大廚聯名", name: "黑白大廚聯名", category: "marketing_event", mentions: 67, sentiment: "positive", trending: true},
-    {id: "618促銷活動", name: "618促銷活動", category: "marketing_event", mentions: 43, sentiment: "positive", trending: true},
+    // 营销事件
+    {id: "黑白大厨联名", name: "黑白大厨联名", category: "marketing_event", mentions: 67, sentiment: "positive", trending: true},
+    {id: "618促销活动", name: "618促销活动", category: "marketing_event", mentions: 43, sentiment: "positive", trending: true},
     
-    // 真實使用場景
+    // 真实使用场景
     {id: "家庭聚餐", name: "家庭聚餐", category: "usage_scenario", mentions: 36, sentiment: "positive", trending: true},
-    {id: "下午茶時光", name: "下午茶時光", category: "usage_scenario", mentions: 38, sentiment: "positive", trending: true},
-    {id: "生日慶祝", name: "生日慶祝", category: "usage_scenario", mentions: 28, sentiment: "positive", trending: true},
+    {id: "下午茶时光", name: "下午茶时光", category: "usage_scenario", mentions: 38, sentiment: "positive", trending: true},
+    {id: "生日庆祝", name: "生日庆祝", category: "usage_scenario", mentions: 28, sentiment: "positive", trending: true},
     {id: "深夜宵夜", name: "深夜宵夜", category: "usage_scenario", mentions: 22, sentiment: "positive", trending: true},
-    {id: "追劇配餐", name: "追劇配餐", category: "usage_scenario", mentions: 15, sentiment: "positive", trending: true},
+    {id: "追剧配餐", name: "追剧配餐", category: "usage_scenario", mentions: 15, sentiment: "positive", trending: true},
     
-    // 消費族群
-    {id: "韓流追星族", name: "韓流追星族", category: "consumer_group", mentions: 67, sentiment: "positive", trending: true},
-    {id: "炸雞愛好者", name: "炸雞愛好者", category: "consumer_group", mentions: 156, sentiment: "positive", trending: true},
-    {id: "蛋撻控", name: "蛋撻控", category: "consumer_group", mentions: 89, sentiment: "positive", trending: true},
-    {id: "優惠券獵人", name: "優惠券獵人", category: "consumer_group", mentions: 124, sentiment: "positive", trending: true},
-    {id: "外送重度用戶", name: "外送重度用戶", category: "consumer_group", mentions: 45, sentiment: "positive", trending: true},
+    // 消费族群
+    {id: "韩流追星族", name: "韩流追星族", category: "consumer_group", mentions: 67, sentiment: "positive", trending: true},
+    {id: "炸鸡爱好者", name: "炸鸡爱好者", category: "consumer_group", mentions: 156, sentiment: "positive", trending: true},
+    {id: "蛋挞控", name: "蛋挞控", category: "consumer_group", mentions: 89, sentiment: "positive", trending: true},
+    {id: "优惠券猎人", name: "优惠券猎人", category: "consumer_group", mentions: 124, sentiment: "positive", trending: true},
+    {id: "外送重度用户", name: "外送重度用户", category: "consumer_group", mentions: 45, sentiment: "positive", trending: true},
     
-    // 購買管道
+    // 购买渠道
     {id: "Foodpanda外送", name: "Foodpanda外送", category: "purchase_channel", mentions: 23, sentiment: "positive", trending: true},
     {id: "KFC官方APP", name: "KFC官方APP", category: "purchase_channel", mentions: 18, sentiment: "positive", trending: true},
-    {id: "門市現場", name: "門市現場", category: "purchase_channel", mentions: 20, sentiment: "neutral", trending: true},
+    {id: "门市现场", name: "门市现场", category: "purchase_channel", mentions: 20, sentiment: "neutral", trending: true},
     
-    // 服務問題
-    {id: "出餐等待時間", name: "出餐等待時間", category: "service_issue", mentions: 61, sentiment: "negative", trending: true},
-    {id: "點餐準確度", name: "點餐準確度", category: "service_issue", mentions: 119, sentiment: "negative", trending: true},
-    {id: "食物保溫效果", name: "食物保溫效果", category: "service_issue", mentions: 34, sentiment: "neutral", trending: true}
+    // 服务问题
+    {id: "出餐等待时间", name: "出餐等待时间", category: "service_issue", mentions: 61, sentiment: "negative", trending: true},
+    {id: "点餐准确度", name: "点餐准确度", category: "service_issue", mentions: 119, sentiment: "negative", trending: true},
+    {id: "食物保温效果", name: "食物保温效果", category: "service_issue", mentions: 34, sentiment: "neutral", trending: true}
   ],
   links: [
-    // 品牌與熱點新品關聯
-    {source: "肯德基", target: "韓式起司脆雞飯", value: 5, relation: "2025爆紅新品"},
-    {source: "肯德基", target: "爆漿卡士達蛋撻", value: 5, relation: "6月回歸限定"},
-    {source: "肯德基", target: "明太子無骨脆雞", value: 4, relation: "夏季限定新品"},
-    {source: "肯德基", target: "青花椒香麻系列", value: 4, relation: "四川風味系列"},
+    // 品牌并热点新品关联
+    {source: "肯德基", target: "韩式起司脆鸡饭", value: 5, relation: "2025爆红新品"},
+    {source: "肯德基", target: "爆浆卡士达蛋挞", value: 5, relation: "6月回归限定"},
+    {source: "肯德基", target: "明太子无骨脆鸡", value: 4, relation: "夏季限定新品"},
+    {source: "肯德基", target: "青花椒香麻系列", value: 4, relation: "四川风味系列"},
     
-    // 品牌與經典產品關聯
-    {source: "肯德基", target: "經典炸雞", value: 5, relation: "招牌產品"},
-    {source: "肯德基", target: "原味蛋撻", value: 5, relation: "經典甜點"},
-    {source: "肯德基", target: "上校雞塊", value: 4, relation: "經典產品"},
+    // 品牌并经典产品关联
+    {source: "肯德基", target: "经典炸鸡", value: 5, relation: "招牌产品"},
+    {source: "肯德基", target: "原味蛋挞", value: 5, relation: "经典甜点"},
+    {source: "肯德基", target: "上校鸡块", value: 4, relation: "经典产品"},
     
-    // 品牌與行銷事件關聯
-    {source: "肯德基", target: "黑白大廚聯名", value: 5, relation: "話題行銷"},
-    {source: "肯德基", target: "618促銷活動", value: 4, relation: "促銷策略"},
+    // 品牌并行销事件关联
+    {source: "肯德基", target: "黑白大厨联名", value: 5, relation: "话题营销"},
+    {source: "肯德基", target: "618促销活动", value: 4, relation: "促销策略"},
     
-    // 熱點產品與事件關聯
-    {source: "韓式起司脆雞飯", target: "黑白大廚聯名", value: 5, relation: "聯名主打"},
-    {source: "韓式起司脆雞飯", target: "韓流追星族", value: 5, relation: "目標客群"},
-    {source: "爆漿卡士達蛋撻", target: "蛋撻控", value: 5, relation: "期待回歸"},
-    {source: "明太子無骨脆雞", target: "下午茶時光", value: 4, relation: "夏季新選擇"},
+    // 热点产品并事件关联
+    {source: "韩式起司脆鸡饭", target: "黑白大厨联名", value: 5, relation: "联名主打"},
+    {source: "韩式起司脆鸡饭", target: "韩流追星族", value: 5, relation: "目标客群"},
+    {source: "爆浆卡士达蛋挞", target: "蛋挞控", value: 5, relation: "期待回归"},
+    {source: "明太子无骨脆鸡", target: "下午茶时光", value: 4, relation: "夏季新选择"},
     
-    // 產品與場景關聯
-    {source: "經典炸雞", target: "家庭聚餐", value: 5, relation: "分享首選"},
-    {source: "原味蛋撻", target: "下午茶時光", value: 5, relation: "經典搭配"},
-    {source: "上校雞塊", target: "生日慶祝", value: 4, relation: "慶祝套餐"},
+    // 产品并场景关联
+    {source: "经典炸鸡", target: "家庭聚餐", value: 5, relation: "分享首选"},
+    {source: "原味蛋挞", target: "下午茶时光", value: 5, relation: "经典搭配"},
+    {source: "上校鸡块", target: "生日庆祝", value: 4, relation: "庆祝套餐"},
     
-    // 消費族群與產品關聯
-    {source: "炸雞愛好者", target: "經典炸雞", value: 5, relation: "忠實偏愛"},
-    {source: "蛋撻控", target: "原味蛋撻", value: 5, relation: "經典首選"},
-    {source: "韓流追星族", target: "韓式起司脆雞飯", value: 5, relation: "話題追蹤"},
-    {source: "優惠券獵人", target: "618促銷活動", value: 5, relation: "優惠追蹤"},
+    // 消费族群并产品关联
+    {source: "炸鸡爱好者", target: "经典炸鸡", value: 5, relation: "忠实偏爱"},
+    {source: "蛋挞控", target: "原味蛋挞", value: 5, relation: "经典首选"},
+    {source: "韩流追星族", target: "韩式起司脆鸡饭", value: 5, relation: "话题跟踪"},
+    {source: "优惠券猎人", target: "618促销活动", value: 5, relation: "优惠追踪"},
     
-    // 購買管道與客群關聯
-    {source: "Foodpanda外送", target: "外送重度用戶", value: 5, relation: "主要管道"},
-    {source: "KFC官方APP", target: "優惠券獵人", value: 4, relation: "優惠獲取"},
-    {source: "門市現場", target: "炸雞愛好者", value: 4, relation: "體驗偏好"},
+    // 购买渠道并客群关联
+    {source: "Foodpanda外送", target: "外送重度用户", value: 5, relation: "主要渠道"},
+    {source: "KFC官方APP", target: "优惠券猎人", value: 4, relation: "优惠获取"},
+    {source: "门市现场", target: "炸鸡爱好者", value: 4, relation: "体验偏好"},
     
-    // 服務問題與客群關聯
-    {source: "出餐等待時間", target: "外送重度用戶", value: 4, relation: "主要痛點"},
-    {source: "點餐準確度", target: "炸雞愛好者", value: 4, relation: "體驗影響"},
-    {source: "食物保溫效果", target: "外送重度用戶", value: 3, relation: "品質關注"}
+    // 服务问题并客群关联
+    {source: "出餐等待时间", target: "外送重度用户", value: 4, relation: "主要痛点"},
+    {source: "点餐准确度", target: "炸鸡爱好者", value: 4, relation: "体验影响"},
+    {source: "食物保温效果", target: "外送重度用户", value: 3, relation: "品质关注"}
   ]
 }
 
-// KFC深度洞察數據
+// KFC深度洞察数据
 export const kfcInsights: Record<string, NodeInsight> = {
   "肯德基": {
-    summary: "肯德基在台灣快餐市場以炸雞專業技術建立領導地位，1237次真實討論中體現出強勢的品牌認知度。2025年與Netflix《黑白大廚》崔鉉碩聯名推出韓式起司脆雞飯引爆話題，結合經典蛋撻優勢，持續鞏固市場地位。",
-    sentiment: "正面",
-    keyPoints: ["炸雞領導地位", "黑白大廚聯名話題", "蛋撻差異化優勢", "韓式創新嘗試"]
+    summary: "肯德基在台湾快餐市场以炸鸡专业技术建立领导地位，1237次真实讨论中体现出强势的品牌认知度。2025年与Netflix《黑白大厨》崔鉉碩联名推出韩式起司脆鸡饭引爆话题，结合经典蛋挞优势，持续巩固市场地位。",
+    sentiment: "positive",
+    keyPoints: ["炸鸡领导地位", "黑白大厨联名话题", "蛋挞差异化优势", "韩式创新尝试"]
   },
-  "韓式起司脆雞飯": {
-    summary: "2025年最具話題性的新品，與Netflix熱門節目《黑白大廚》崔鉉碩聯名推出。87次討論中消費者對韓式辣醬和起司融合的創新口感給予高度評價，'終於等到你'的熱烈反應體現出成功的跨界合作。",
-    sentiment: "正面",
-    keyPoints: ["Netflix聯名話題", "崔鉉碩主廚加持", "韓式創新口感", "社群媒體熱議"]
+  "韩式起司脆鸡饭": {
+    summary: "2025年最具话题性的新品，与Netflix热门节目《黑白大厨》崔鉉碩联名推出。87次讨论中消费者对韩式辣酱和起司融合的创新口感给予高度评价，'终于等到你'的热烈反应体现出成功的跨界合作。",
+    sentiment: "positive",
+    keyPoints: ["Netflix联名话题", "崔鉉碩主厨加持", "韩式创新口感", "社交媒体热议"]
   },
-  "爆漿卡士達蛋撻": {
-    summary: "6月強勢回歸的限定蛋撻，64次討論中展現出消費者的高度期待和喜愛。'要衝啊'等熱烈反應反映出稀缺性行銷的成功，爆漿設計升級了經典蛋撻體驗。",
+  "爆浆卡士达蛋挞": {
+    summary: "6月强势回归的限定蛋挞，64次讨论中展现出消费者的高度期待和喜爱。“要冲啊”等热烈反应反映出稀缺性营销的成功，爆浆设计升级了经典蛋挞体验。",
     sentiment: "正面",
-    keyPoints: ["限定回歸話題", "爆漿創新設計", "消費者高度期待", "稀缺性行銷成功"]
+    keyPoints: ["限定回归话题", "爆浆创新设计", "消费者高度期待", "稀缺性营销成功"]
   },
-  "經典炸雞": {
-    summary: "肯德基的絕對招牌產品，176次討論中體現出無可撼動的品牌象徵地位。獨特的11種香料調味配方和外酥內嫩口感，創造了競爭對手難以複製的味覺記憶。",
+  "经典炸鸡": {
+    summary: "肯德基的绝对招牌产品，176次讨论中体现出无可撼动的品牌象征地位。独特的11种香料调味配方和外酥内嫩口感，创造了竞争对手难以复制的味觉记忆。",
     sentiment: "正面",
-    keyPoints: ["品牌象徵地位", "11種香料秘方", "外酥內嫩口感", "無法複製優勢"]
+    keyPoints: ["品牌象征地位", "11种香料秘方", "外酥内嫩口感", "无法复制优势"]
   },
-  "原味蛋撻": {
-    summary: "肯德基最具代表性的甜點，89次討論中消費者一致認為'吃來吃去就原味蛋撻最好吃'。酥脆塔皮配香滑卡士達的經典組合，創造了快餐界獨一無二的甜點體驗。",
+  "原味蛋挞": {
+    summary: "肯德基最具代表性的甜点，89次讨论中消费者一致认为'吃来吃去就原味蛋挞最好吃'。酥脆塔皮配香滑卡士达的经典组合，创造了快餐界独一无二的甜点体验。",
     sentiment: "正面",
-    keyPoints: ["最具代表性甜點", "消費者一致認可", "經典組合完美", "獨一無二體驗"]
+    keyPoints: ["最具代表性甜点", "消费者一致认可", "经典组合完美", "独一无二体验"]
   },
-  "黑白大廚聯名": {
-    summary: "2025年最成功的話題行銷事件，與Netflix熱門節目《黑白大廚》崔鉉碩聯名合作。67次討論中體現出'終於等到你'的消費者期待，成功結合流行文化與美食創新。",
+  "黑白大厨联名": {
+    summary: "2025年最成功的话题营销事件，与Netflix热门节目《黑白大厨》崔鉉碩联名合作。67次讨论中体现出'终于等到你'的消费者期待，成功结合流行文化与美食创新。",
     sentiment: "正面",
-    keyPoints: ["Netflix熱門聯名", "崔鉉碩主廚加持", "流行文化結合", "年輕客群吸引"]
+    keyPoints: ["Netflix热门联名", "崔鉉碩主厨加持", "流行文化结合", "年轻客群吸引"]
   },
-  "韓流追星族": {
-    summary: "受《黑白大廚》聯名影響而關注肯德基的新興客群，67次討論中展現出對韓式料理和K-culture的高度興趣。韓式起司脆雞飯成為這個族群的話題焦點。",
+  "韩流追星族": {
+    summary: "受《黑白大厨》联名影响而关注肯德基的新兴客群，67次讨论中展现出对韩式料理和K-culture的高度兴趣。韩式起司脆鸡饭成为这个族群的话题焦点。",
     sentiment: "正面",
-    keyPoints: ["Netflix節目影響", "K-culture興趣", "話題焦點產品", "流行文化驅動"]
+    keyPoints: ["Netflix节目影响", "K-culture兴趣", "话题焦点产品", "流行文化驱动"]
   },
-  "蛋撻控": {
-    summary: "專門為蛋撻而來的忠實客群，89次討論中體現出對蛋撻產品的深度依戀。從原味到爆漿卡士達的每次創新都能引起這個族群的高度關注。",
+  "蛋挞控": {
+    summary: "专门为蛋挞而来的忠实客群，89次讨论中体现出对蛋挞产品的深度依恋。从原味到爆浆卡士达的每次创新都能引起这个族群的高度关注。",
     sentiment: "正面",
-    keyPoints: ["蛋撻深度依戀", "創新高度關注", "忠實客群支撐", "甜點策略核心"]
+    keyPoints: ["蛋挞深度依恋", "创新高度关注", "忠实客群支撑", "甜点策略核心"]
   },
-  "優惠券獵人": {
-    summary: "積極追蹤和分享優惠資訊的價格敏感族群，124次討論中體現出對618促銷、信用卡優惠等價格策略的高度關注。具有很強的口碑傳播力。",
+  "优惠券猎人": {
+    summary: "积极追踪和分享优惠资讯的价格敏感族群，124次讨论中体现出对618促销、信用卡优惠等价格策略的高度关注。具有很强的口碑传播力。",
     sentiment: "正面",
-    keyPoints: ["價格敏感特徵", "優惠資訊分享", "促銷活動關注", "口碑傳播力"]
+    keyPoints: ["价格敏感特征", "优惠信息分享", "促销活动关注", "口碑传播力"]
   },
-  "炸雞愛好者": {
-    summary: "對肯德基11種香料炸雞情有獨鍾的核心客群，156次討論中體現出對品牌的深度忠誠。是品牌最重要的支撐力量。",
+  "炸鸡爱好者": {
+    summary: "对肯德基11种香料炸鸡情有独钟的核心客群，156次讨论中体现出对品牌的深度忠诚。是品牌最重要的支撑力量。",
     sentiment: "正面", 
-    keyPoints: ["核心忠實客群", "11種香料偏愛", "品牌深度忠誠", "支撐力量"]
+    keyPoints: ["核心忠实客群", "11种香料偏爱", "品牌深度忠诚", "支撑力量"]
   },
   "家庭聚餐": {
-    summary: "家庭聚餐是肯德基的核心使用場景，36次討論中體現出炸雞分享特性的社交價值。'慶祝開幕'等聚餐活動反映出肯德基在重要時刻的參與度。",
+    summary: "家庭聚餐是肯德基的核心使用场景，36次讨论中体现出炸鸡分享特性的社交价值。“庆祝开幕”等聚餐活动反映出肯德基在重要时刻的参与度。",
     sentiment: "正面",
-    keyPoints: ["核心使用場景", "分享社交價值", "重要時刻參與", "家庭友善品牌"]
+    keyPoints: ["核心使用场景", "分享社交价值", "重要时刻参与", "家庭友善品牌"]
   },
-  "下午茶時光": {
-    summary: "下午茶場景在38次討論中展現出蛋撻配飲料的經典組合魅力。'坐下來聊天，吃個小點心'體現了肯德基在休閒社交場景中的重要地位。",
+  "下午茶时光": {
+    summary: "下午茶场景在38次讨论中展现出蛋挞配饮料的经典组合魅力。'坐下来聊天，吃个小点心'体现了肯德基在休闲社交场景中的重要地位。",
     sentiment: "正面",
-    keyPoints: ["蛋撻經典組合", "休閒社交場景", "聊天配餐首選", "輕鬆氛圍營造"]
+    keyPoints: ["蛋挞经典组合", "休闲社交场景", "聊天配餐首选", "轻松氛围营造"]
   }
 }
 
@@ -450,7 +450,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
   const [showInsight, setShowInsight] = useState(false)
   const [generateFeedback, setGenerateFeedback] = useState('')
 
-  // 注入樣式
+  // 注入样式
   useEffect(() => {
     const styleElement = document.createElement('style')
     styleElement.textContent = styles
@@ -461,7 +461,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
     }
   }, [])
 
-  // D3.js 圖形渲染
+  // D3.js 图形渲染（已修正为简体中文）
   useEffect(() => {
     if (!isVisible || !svgRef.current || !data.nodes.length) return
 
@@ -470,7 +470,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
 
     const g = svg.append("g")
     
-    // 創建力導向模擬
+    // 创建力导向模拟
     const simulation = d3.forceSimulation(data.nodes)
       .force("link", d3.forceLink(data.links).id((d: any) => d.id).distance(80).strength(0.8))
       .force("charge", d3.forceManyBody().strength(-300))
@@ -479,7 +479,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
       .force("x", d3.forceX(width / 2).strength(0.1))
       .force("y", d3.forceY(height / 2).strength(0.1))
 
-    // 創建連結線
+    // 创建连接线
     const link = g.append("g")
       .selectAll("line")
       .data(data.links)
@@ -489,7 +489,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
       .attr("stroke-opacity", 0.6)
       .attr("stroke-width", (d: any) => d.value)
 
-    // 創建連結標籤
+    // 创建连接标签
     const linkLabels = g.append("g")
       .selectAll("text")
       .data(data.links)
@@ -499,7 +499,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
       .attr("dy", -2)
       .text((d: any) => d.relation)
 
-    // 創建節點
+    // 创建节点
     const node = g.append("g")
       .selectAll("g")
       .data(data.nodes)
@@ -535,14 +535,14 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
       .attr("font-size", 10)
       .attr("fill", "#e0e0e0")
 
-    // 添加點擊事件
+    // 添加点击事件
     node.on("click", (event: any, d: any) => {
       setSelectedNode(d)
       setShowInsight(true)
       onNodeClick(d, insights[d.id])
     })
 
-    // 添加拖拽行為
+    // 添加拖拽行为
     const drag = d3.drag()
       .on("start", (event: any, d: any) => {
         if (!event.active) simulation.alphaTarget(0.3).restart()
@@ -575,8 +575,21 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
 
       node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
     })
+    simulation.on("tick", () => {
+      link
+        .attr("x1", (d: any) => d.source.x)
+        .attr("y1", (d: any) => d.source.y)
+        .attr("x2", (d: any) => d.target.x)
+        .attr("y2", (d: any) => d.target.y)
 
-    // 添加縮放行為
+      linkLabels
+        .attr("x", (d: any) => (d.source.x + d.target.x) / 2)
+        .attr("y", (d: any) => (d.source.y + d.target.y) / 2)
+
+      node.attr("transform", (d: any) => `translate(${d.x},${d.y})`)
+    })
+
+    // 添加缩放行为
     const zoom = d3.zoom()
       .scaleExtent([0.1, 4])
       .on("zoom", (event: any) => {
@@ -589,7 +602,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
 
   if (!isVisible) return null
 
-  // 計算統計數據
+  // 计算统计数据
   const defaultStats = data === kfcGraphData ? kfcStats : [
     { label: language.nodesTotalLabel, value: data.nodes.length, color: "#f87171" },
     { label: language.linksTotalLabel, value: data.links.length, color: "#f87171" },
@@ -597,7 +610,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
 
   const displayStats = stats || defaultStats
 
-  // 計算圖例
+  // 计算图例
   const defaultLegend = data === kfcGraphData ? kfcLegend : Object.keys(colorMap).map(category => ({
     category,
     label: category,
@@ -767,7 +780,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
                 className="rounded-lg p-3 mb-4"
                 style={{ backgroundColor: '#374151' }}
               >
-                <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>討論熱度</div>
+                <div style={{ fontSize: '0.875rem', color: '#d1d5db' }}>讨论热度</div>
                 <div 
                   className="text-xl font-bold"
                   style={{ color: '#f87171' }}
@@ -847,26 +860,26 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
               {/* Generate Button */}
               <button
                 onClick={() => {
-                  console.log('🎨 生成廣告素材按鈕被點擊:', selectedNode?.name);
+                  console.log('🎨 生成广告素材按钮被点击:', selectedNode?.name);
                   
-                  // 顯示短暫反饋，不阻塞按鈕
-                  setGenerateFeedback(`正在創建 ${selectedNode?.name} 節點...`);
+                  // 显示短暂反馈，不阻塞按钮
+                  setGenerateFeedback(`正在创建 ${selectedNode?.name} 节点...`);
                   
-                  // 直接創建 concept 節點
+                  // 直接创建 concept 节点
                   const conceptData = {
                     title: selectedNode?.name || '',
                     content: selectedNode?.name || '',
                     insight: insights[selectedNode?.id]
                   };
                   
-                  console.log('🎯 直接發送創建 concept 事件:', conceptData);
+                  console.log('🎯 直接发送创建 concept 事件:', conceptData);
                   window.dispatchEvent(new CustomEvent('createConceptFromKnowledgeGraph', {
                     detail: conceptData
                   }));
                   
-                  // 短暫的成功反饋，不阻塞按鈕
+                  // 短暂的成功反馈，不阻塞按钮
                   setTimeout(() => {
-                    setGenerateFeedback(`✅ ${selectedNode?.name} 已加入編輯器！`);
+                    setGenerateFeedback(`✅ ${selectedNode?.name} 已加入编辑器！`);
                     setTimeout(() => {
                       setGenerateFeedback('');
                     }, 1500);
@@ -911,7 +924,7 @@ export default function KnowledgeGraph(props: KnowledgeGraphProps) {
   )
 }
 
-// KFC專用便利組件 - 直接使用，無需配置
+// KFC专用便利组件 - 直接使用，无需配置
 export function KFCKnowledgeGraph({ 
   isVisible, 
   onClose, 
@@ -933,8 +946,8 @@ export function KFCKnowledgeGraph({
       stats={kfcStats}
       legend={kfcLegend}
       language={kfcLanguage}
-      title="🍗 肯德基輿情知識圖譜"
-      subtitle="基於1237則真實討論的AI深度分析 • 點擊節點生成對應廣告素材"
+      title="🍗 肯德基舆情知识图谱"
+      subtitle="基于1237则真实讨论的AI深度分析 • 点击节点生成对应广告素材"
     />
   )
 }
@@ -942,7 +955,7 @@ export function KFCKnowledgeGraph({
 // 使用示例：
 
 /* 
-// 方法1：使用便利的KFC組件（推薦）
+// 方法1：使用便利的KFC组件（推荐）
 import { KFCKnowledgeGraph } from './KnowledgeGraph'
 
 function App() {
@@ -951,16 +964,16 @@ function App() {
   return (
     <div>
       <button onClick={() => setShowKFCGraph(true)}>
-        打開KFC知識圖譜
+        打开KFC知识图谱
       </button>
       
       <KFCKnowledgeGraph
         isVisible={showKFCGraph}
         onClose={() => setShowKFCGraph(false)}
         onNodeClick={(node, insight) => {
-          console.log('🍗 KFC節點點擊:', node.name)
+          console.log('🍗 KFC节点点击:', node.name)
           console.log('💡 洞察:', insight)
-          // 在這裡可以觸發廣告素材生成等功能
+          // 在这里可以触发广告素材生成等功能
         }}
       />
     </div>
@@ -969,7 +982,7 @@ function App() {
 */
 
 /* 
-// 方法2：使用完整配置的通用組件
+// 方法2：使用完整配置的通用组件
 import KnowledgeGraph, { kfcGraphData, kfcInsights, kfcCreativeTemplates } from './KnowledgeGraph'
 
 function App() {
@@ -978,20 +991,20 @@ function App() {
   return (
     <div>
       <button onClick={() => setShowGraph(true)}>
-        打開自定義知識圖譜
+        打开自定义知识图谱
       </button>
       
       <KnowledgeGraph
         isVisible={showGraph}
         onClose={() => setShowGraph(false)}
         onNodeClick={(node, insight) => {
-          console.log('節點點擊:', node.name, insight)
+          console.log('节点点击:', node.name, insight)
         }}
         data={kfcGraphData}
         insights={kfcInsights}
         creativeTemplates={kfcCreativeTemplates}
         title="我的KFC分析"
-        subtitle="自定義的輿情分析"
+        subtitle="自定义的舆情分析"
       />
     </div>
   )
@@ -999,25 +1012,25 @@ function App() {
 */
 
 /*
-// 方法3：使用自己的數據
+// 方法3：使用自己的数据
 import KnowledgeGraph from './KnowledgeGraph'
 
 const myData = {
   nodes: [
-    {id: "node1", name: "節點1", category: "primary", mentions: 100, sentiment: "positive", trending: true},
-    // ... 更多節點
+    {id: "node1", name: "节点1", category: "primary", mentions: 100, sentiment: "positive", trending: true},
+    // ... 更多节点
   ],
   links: [
-    {source: "node1", target: "node2", value: 5, relation: "強關聯"},
-    // ... 更多連結
+    {source: "node1", target: "node2", value: 5, relation: "强关联"},
+    // ... 更多链接
   ]
 }
 
 const myInsights = {
   "node1": {
-    summary: "這是我的節點分析...",
+    summary: "这是我的节点分析...",
     sentiment: "正面",
-    keyPoints: ["特點1", "特點2", "特點3"]
+    keyPoints: ["特点1", "特点2", "特点3"]
   }
 }
 
@@ -1027,18 +1040,18 @@ function App() {
   return (
     <div>
       <button onClick={() => setShowGraph(true)}>
-        打開我的知識圖譜
+        打开我的知识图谱
       </button>
       
       <KnowledgeGraph
         isVisible={showGraph}
         onClose={() => setShowGraph(false)}
         onNodeClick={(node, insight) => {
-          console.log('點擊了:', node.name)
+          console.log('点击了:', node.name)
         }}
         data={myData}
         insights={myInsights}
-        title="我的知識圖譜"
+        title="我的知识图谱"
       />
     </div>
   )
@@ -1046,19 +1059,19 @@ function App() {
 */
 
 /*
-安裝依賴：
+安装依赖：
 npm install d3 @types/d3 react
 
 特色功能：
-✅ 完全獨立 - 無外部CSS依賴，內嵌所有樣式
-✅ 開箱即用 - 包含完整KFC輿情數據和洞察
-✅ 高度可配置 - 支援自定義數據、顏色、語言等
-✅ 互動式圖表 - D3.js力導向布局，支援拖拽縮放
-✅ 深度洞察面板 - 點擊節點顯示詳細分析
-✅ 創意模板系統 - 內建廣告創意生成模板
-✅ 響應式設計 - 適應各種螢幕尺寸
-✅ TypeScript支援 - 完整的型別定義
+✅ 完全独立 - 无外部CSS依赖，内嵌所有样式
+✅ 开箱即用 - 包含完整KFC舆情数据和洞察
+✅ 高度可配置 - 支持自定义数据、颜色、语言等
+✅ 互动式图表 - D3.js力导向布局，支持拖拽缩放
+✅ 深度洞察面板 - 点击节点显示详细分析
+✅ 创意模板系统 - 内建广告创意生成模板
+✅ 响应式设计 - 适应各种屏幕尺寸
+✅ TypeScript支持 - 完整的类型定义
 
-直接複製這個檔案到你的專案就可以使用！
+直接复制这个文件到你的项目就可以使用！
 */
 

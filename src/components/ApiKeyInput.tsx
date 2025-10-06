@@ -9,7 +9,7 @@ export default function ApiKeyInput() {
   const [tempKey, setTempKey] = useState('');
 
   useEffect(() => {
-    // 從 localStorage 讀取 API Key
+    // 从 localStorage 读取 API Key
     const savedKey = localStorage.getItem('gemini_api_key') || '';
     setApiKey(savedKey);
     setTempKey(savedKey);
@@ -46,7 +46,7 @@ export default function ApiKeyInput() {
             onClick={() => setIsEditing(true)}
             className="px-3 py-2 text-sm font-medium text-banana-600 hover:text-banana-700 hover:bg-banana-50 rounded-lg transition-colors"
           >
-            {apiKey ? '編輯' : '設定'}
+            {apiKey ? '编辑' : '设置'}
           </button>
         </>
       ) : (
@@ -55,7 +55,7 @@ export default function ApiKeyInput() {
             type="text"
             value={tempKey}
             onChange={(e) => setTempKey(e.target.value)}
-            placeholder="輸入 Gemini API Key"
+            placeholder="输入 Gemini API Key"
             className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500 text-sm font-mono"
             style={{ width: '280px' }}
           />
@@ -63,7 +63,7 @@ export default function ApiKeyInput() {
             onClick={handleSave}
             className="px-3 py-2 bg-banana-500 text-white text-sm font-medium rounded-lg hover:bg-banana-600 transition-colors"
           >
-            儲存
+            保存
           </button>
           <button
             onClick={handleCancel}

@@ -24,7 +24,7 @@ interface CreativeNodeProps {
   id: string;
 }
 
-// SVG 圖標組件
+// SVG 图标组件
 const AddIcon = () => (
   <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
     <path d="M8 1a.75.75 0 01.75.75V7H14a.75.75 0 010 1.5H8.75v5.25a.75.75 0 01-1.5 0V8.5H1.75a.75.75 0 010-1.5h5.5V1.75A.75.75 0 018 1z"/>
@@ -197,7 +197,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
               alt={data.title}
               className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => {
-                // 創建帶浮水印的圖片用於預覽
+                // 创建带水印的图片用于预览
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const img = new Image();
@@ -207,20 +207,20 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
                   canvas.width = img.width;
                   canvas.height = img.height;
                   
-                  // 繪製原圖
+                  // 绘制原图
                   ctx?.drawImage(img, 0, 0);
                   
                   if (ctx) {
                     // 图片预览（无水印）
                     
-                    // 轉換為 data URL 並預覽
+                    // 转换为 data URL 并预览
                     const watermarkedImage = canvas.toDataURL('image/jpeg', 0.95);
                     data.onImageClick?.(watermarkedImage);
                   }
                 };
                 
                 img.onerror = () => {
-                  // 如果載入失敗，使用原圖
+                  // 如果加载失败，使用原图
                   data.onImageClick?.(data.imageUrl!);
                 };
                 
@@ -230,12 +230,12 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
             
 
             
-            {/* 下載按鈕 */}
+            {/* 下载按钮 */}
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  // 創建帶浮水印的圖片並下載
+                  // 创建带水印的图片并下载
                   const canvas = document.createElement('canvas');
                   const ctx = canvas.getContext('2d');
                   const img = new Image();
@@ -245,7 +245,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
                     canvas.width = img.width;
                     canvas.height = img.height;
                     
-                    // 繪製原圖
+                    // 绘制原图
                     ctx?.drawImage(img, 0, 0);
                     
                     if (ctx) {

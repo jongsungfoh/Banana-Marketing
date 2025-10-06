@@ -21,7 +21,7 @@ interface ProductNodeProps {
   id: string;
 }
 
-// SVG 圖標組件
+// SVG 图标组件
 const AddIcon = () => (
   <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
     <path d="M8 1a.75.75 0 01.75.75V7H14a.75.75 0 010 1.5H8.75v5.25a.75.75 0 01-1.5 0V8.5H1.75a.75.75 0 010-1.5h5.5V1.75A.75.75 0 018 1z"/>

@@ -1,4 +1,4 @@
-// 產品分析結果
+// 产品分析結果
 export interface ProductAnalysis {
   summary: string;
   creative_prompts: {

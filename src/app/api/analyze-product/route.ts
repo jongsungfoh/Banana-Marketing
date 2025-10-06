@@ -20,43 +20,43 @@ export async function POST(request: NextRequest) {
     const apiKey = formData.get('api_key') as string;
 
     if (!productImage) {
-      return NextResponse.json({ error: '沒有上傳產品圖片' }, { status: 400 });
+      return NextResponse.json({ error: '没有上传产品图片' }, { status: 400 });
     }
 
     if (!apiKey) {
       return NextResponse.json({ error: '需要提供 API Key' }, { status: 400 });
     }
 
-    // 使用用戶提供的 API Key
+    // 使用用户提供的 API Key
     console.log('🤖 Initializing Gemini model...');
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     console.log('✅ Gemini model initialized');
 
-    // 讀取圖片數據
+    // 读取图片数据
     const bytes = await productImage.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const base64Image = buffer.toString('base64');
 
     const analysisPrompt = (language === 'zh' || language === 'zh-tw') 
-      ? `用繁體中文快速分析產品，提供5個創意概念，保持簡潔。
+      ? `用简体中文快速分析产品，提供5个创意概念，保持简洁。
 
 JSON格式：
 {
   "reasoning_steps": [
-    {"step": "產品分析", "analysis": "簡短產品描述"},
-    {"step": "目標客群", "analysis": "簡短客群分析"},
-    {"step": "視覺特點", "analysis": "簡短外觀特色"},
-    {"step": "市場策略", "analysis": "簡短市場定位"},
-    {"step": "廣告方向", "analysis": "簡短廣告重點"}
+    {"step": "产品分析", "analysis": "简短产品描述"},
+    {"step": "目标客群", "analysis": "简短客群分析"},
+    {"step": "视觉特点", "analysis": "简短外观特色"},
+    {"step": "市场策略", "analysis": "简短市场定位"},
+    {"step": "广告方向", "analysis": "简短广告重点"}
   ],
-  "product_type": "產品類別",
+  "product_type": "产品类别",
   "creative_concepts": [
-    {"name": "英雄照片", "description": "簡短說明", "rationale": "簡短理由"},
-    {"name": "生活情境", "description": "簡短說明", "rationale": "簡短理由"},
-    {"name": "簡約風格", "description": "簡短說明", "rationale": "簡短理由"},
-    {"name": "高端品牌", "description": "簡短說明", "rationale": "簡短理由"},
-    {"name": "創意表現", "description": "簡短說明", "rationale": "簡短理由"}
+    {"name": "英雄照片", "description": "简短说明", "rationale": "简短理由"},
+    {"name": "生活情境", "description": "简短说明", "rationale": "简短理由"},
+    {"name": "简约风格", "description": "简短说明", "rationale": "简短理由"},
+    {"name": "高端品牌", "description": "简短说明", "rationale": "简短理由"},
+    {"name": "创意表现", "description": "简短说明", "rationale": "简短理由"}
   ]
 }`
       : `Analyze this product quickly and provide 5 creative concepts. Be concise.
@@ -89,7 +89,7 @@ JSON format:
 
     console.log('🚀 Calling Gemini API...');
     
-    // 加入超時處理
+    // 加入超时处理
     const timeoutPromise = new Promise<never>((_, reject) => {
       setTimeout(() => reject(new Error('Gemini API timeout after 30 seconds')), 30000);
     });
@@ -103,7 +103,7 @@ JSON format:
     const text = response.text();
     console.log('✅ Response text extracted, length:', text.length);
 
-    // 解析 JSON 響應
+    // 解析 JSON 响应
     let parsedAnalysisData;
     let reasoningSteps: ReasoningStep[] = [];
     let creativePrompts;
@@ -123,7 +123,7 @@ JSON format:
             concept: concept.name,
             prompt: concept.description,
             rationale: concept.rationale,
-            background: '專業攝影棚背景',
+            background: '专业摄影棚背景',
             include_model: false
           }));
           console.log('✅ Parsed creative concepts:', creativePrompts.length);
@@ -132,7 +132,7 @@ JSON format:
         console.warn('⚠️ No JSON found in response');
       }
     } catch (error) {
-      console.error('解析 JSON 失敗:', error);
+      console.error('解析 JSON 失败:', error);
       console.log('📄 Raw response text:', text);
       creativePrompts = generateCreativePrompts();
       reasoningSteps = [];
@@ -142,7 +142,7 @@ JSON format:
       creativePrompts = generateCreativePrompts();
     }
 
-    // 將圖片轉換為 base64 URL 供前端使用
+    // 将图片转换为 base64 URL 供前端使用
     const productImageUrl = `data:${productImage.type};base64,${base64Image}`;
 
     console.log('📊 Final response data:', {
@@ -160,10 +160,10 @@ JSON format:
     });
 
   } catch (error) {
-    console.error('分析產品時發生錯誤:', error);
+    console.error('分析产品时发生错误:', error);
     return NextResponse.json(
       { 
-        error: '分析產品時發生錯誤',
+        error: '分析产品时发生错误',
         details: (error as Error)?.message || 'Unknown error'
       },
       { status: 500 }
@@ -171,43 +171,17 @@ JSON format:
   }
 }
 
-function generateCreativePrompts() {
-  return [
-    {
-      concept: '英雄照片',
-      prompt: '產品突出展示，配有戲劇性照明和高級質感',
-      background: '漸變背景配細微紋理',
+function generateCreativePrompts(productType: string, concepts: any[], language: string = 'zh-tw') {
+  return concepts.map((concept, index) => {
+    const basePrompt = language === 'zh' || language === 'zh-tw' 
+      ? `创建${productType}的${concept.name}广告创意，${concept.description}。风格：${concept.rationale}。`
+      : `Create ${concept.name} ad creative for ${productType}, ${concept.description}. Style: ${concept.rationale}.`;
+    return {
+      concept: concept.name,
+      prompt: basePrompt,
+      rationale: concept.rationale,
+      background: '专业摄影棚背景',
       include_model: false
-    },
-    {
-      concept: '生活場景',
-      prompt: '產品在自然使用環境中配生活元素',
-      background: '符合產品用途的真實環境',
-      include_model: false
-    },
-    {
-      concept: '模特展示',
-      prompt: '有吸引力的模特以吸引人的方式展示或持有產品',
-      background: '專業攝影棚或生活環境',
-      include_model: true
-    },
-    {
-      concept: '極簡潔淨',
-      prompt: '乾淨、極簡的構圖，專注於產品設計',
-      background: '純白或細微幾何背景',
-      include_model: false
-    },
-    {
-      concept: '動態動作',
-      prompt: '產品以動態、充滿活力的構圖展示，帶有運動感',
-      background: '抽象動態背景配動態模糊效果',
-      include_model: false
-    },
-    {
-      concept: '奢華高級',
-      prompt: '高端、奢華的呈現，配高級材料和照明',
-      background: '豐富紋理、大理石或高級材料背景',
-      include_model: false
-    }
-  ];
+    };
+  });
 }
