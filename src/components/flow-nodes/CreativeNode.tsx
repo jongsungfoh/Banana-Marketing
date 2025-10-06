@@ -211,21 +211,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
                   ctx?.drawImage(img, 0, 0);
                   
                   if (ctx) {
-                    // 添加浮水印
-                    const fontSize = Math.max(12, img.width / 40);
-                    ctx.font = `${fontSize}px Arial, sans-serif`;
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-                    ctx.lineWidth = 1;
-                    
-                    const text = 'Powered by The Pocket Company';
-                    const textMetrics = ctx.measureText(text);
-                    const x = img.width - textMetrics.width - 20;
-                    const y = img.height - 20;
-                    
-                    // 繪製文字（先描邊再填充）
-                    ctx.strokeText(text, x, y);
-                    ctx.fillText(text, x, y);
+                    // 图片预览（无水印）
                     
                     // 轉換為 data URL 並預覽
                     const watermarkedImage = canvas.toDataURL('image/jpeg', 0.95);
@@ -242,10 +228,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
               }}
             />
             
-            {/* CSS 浮水印 */}
-            <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
-              Powered by The Pocket Company
-            </div>
+
             
             {/* 下載按鈕 */}
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -266,23 +249,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
                     ctx?.drawImage(img, 0, 0);
                     
                     if (ctx) {
-                      // 添加浮水印
-                      const fontSize = Math.max(12, img.width / 40);
-                      ctx.font = `${fontSize}px Arial, sans-serif`;
-                      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-                      ctx.strokeStyle = 'rgba(0, 0, 0, 0.7)';
-                      ctx.lineWidth = 1;
-                      
-                      const text = 'Powered by The Pocket Company';
-                      const textMetrics = ctx.measureText(text);
-                      const x = img.width - textMetrics.width - 20;
-                      const y = img.height - 20;
-                      
-                      // 繪製文字
-                      ctx.strokeText(text, x, y);
-                      ctx.fillText(text, x, y);
-                      
-                      // 下載圖片
+                      // 下载图片（无水印）
                       canvas.toBlob((blob) => {
                         if (blob) {
                           const url = URL.createObjectURL(blob);
@@ -301,7 +268,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
                   img.src = data.imageUrl!;
                 }}
                 className="w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-md transition-colors"
-                title="Download with watermark"
+                title="Download"
               >
                 <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

@@ -79,7 +79,7 @@ export default function Header() {
                   Open Source Edition
                 </span>
               </div>
-              <p className="text-xs text-gray-500 font-medium">Powered by The Pocket Company</p>
+      
             </div>
           </motion.div>
 
