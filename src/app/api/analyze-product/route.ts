@@ -134,12 +134,12 @@ JSON format:
     } catch (error) {
       console.error('解析 JSON 失败:', error);
       console.log('📄 Raw response text:', text);
-      creativePrompts = generateCreativePrompts();
+      creativePrompts = generateCreativePrompts('product', [], language);
       reasoningSteps = [];
     }
 
     if (!creativePrompts) {
-      creativePrompts = generateCreativePrompts();
+      creativePrompts = generateCreativePrompts('product', [], language);
     }
 
     // 将图片转换为 base64 URL 供前端使用
