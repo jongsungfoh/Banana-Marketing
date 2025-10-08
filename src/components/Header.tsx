@@ -11,6 +11,8 @@ interface HeaderProps {
   onSaveClick?: () => void;
   onMergeImagesClick?: () => void;
   onPlatformSizeClick?: () => void;
+  onShowQrModal?: () => void;
+  onShowApiModal?: () => void;
   showMobileControls?: boolean;
 }
 
@@ -97,10 +99,10 @@ export default function Header({
   return (
     <header className="glass sticky top-0 z-50 border-b border-white/20">
       <div className="w-full px-6">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 overflow-x-auto min-w-max scrollbar-hide">
           {/* Left Side - Logo */}
           <motion.div 
-            className="flex items-center space-x-3 cursor-pointer"
+            className="flex items-center space-x-3 cursor-pointer min-w-max"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
@@ -110,7 +112,7 @@ export default function Header({
               <span className="text-3xl animate-float select-none">🍌</span>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-banana-400 to-banana-500 rounded-full animate-pulse"></div>
             </div>
-            <div className="relative">
+            <div className="relative max-md:hidden">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold gradient-text">Banana Marketing</h1>
               </div>
@@ -121,7 +123,7 @@ export default function Header({
           </motion.div>
 
           {/* Desktop Navigation - Always show desktop layout */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-3 min-w-max">
             {/* Logo - Left side */}
             <motion.a
               href={currentLanguage === 'en-us' ? 'https://lushcloud.ai/request?lang=en' : 'https://lushcloud.ai/request?lang=zh'}
@@ -181,6 +183,8 @@ export default function Header({
               </span>
             </motion.button>
 
+
+
             {/* API Key Input */}
             <div className="relative">
               <input
@@ -196,20 +200,7 @@ export default function Header({
               >
                 {isApiKeyVisible ? t[currentLanguage].hideKey : t[currentLanguage].showKey}
               </button>
-              {/* API Info Button - 只在API密钥为空时显示 */}
-              {!apiKey && (
-                <button
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      window.dispatchEvent(new CustomEvent('showApiInfoModal'));
-                    }
-                  }}
-                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-5 h-5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center transition-colors duration-200"
-                  title="API Information"
-                >
-                  !
-                </button>
-              )}
+
             </div>
           </div>
 
@@ -286,7 +277,7 @@ export default function Header({
                       }}
                       className="w-full px-3 py-2 text-sm bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-md transition-colors duration-200 text-left"
                     >
-                      📐 {currentLanguage === 'en-us' ? 'Format' : '格式'}
+                      📐 {currentLanguage === 'en-us' ? 'Platform & Size' : '平台与尺寸'}
                     </button>
                   </div>
                 )}
@@ -338,59 +329,7 @@ export default function Header({
         </AnimatePresence>
       </div>
 
-      {/* API Key Modal */}
-      {showApiKey && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-96 max-w-full mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">API Key Settings</h3>
-              <button
-                onClick={() => setShowApiKey(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <XMarkIcon className="w-6 h-6" />
-              </button>
-            </div>
-            <div className="relative">
-              <input
-                type={isApiKeyVisible ? "text" : "password"}
-                value={apiKey}
-                onChange={(e) => handleApiKeyChange(e.target.value)}
-                placeholder={t[currentLanguage].apiKeyPlaceholder}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500 focus:border-transparent pr-16"
-              />
-              <button
-                onClick={() => setIsApiKeyVisible(!isApiKeyVisible)}
-                className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"
-              >
-                {isApiKeyVisible ? t[currentLanguage].hideKey : t[currentLanguage].showKey}
-              </button>
-              {/* API Info Button - 只在API密钥为空时显示 */}
-              {!apiKey && (
-                <button
-                  onClick={() => {
-                    if (typeof window !== 'undefined') {
-                      window.dispatchEvent(new CustomEvent('showApiInfoModal'));
-                    }
-                  }}
-                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-5 h-5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center transition-colors duration-200"
-                  title="API Information"
-                >
-                  !
-                </button>
-              )}
-            </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                onClick={() => setShowApiKey(false)}
-                className="px-4 py-2 bg-banana-500 text-white rounded-lg hover:bg-banana-600 transition-colors"
-              >
-                {t[currentLanguage].closeButton}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+
     </header>
   )
 }

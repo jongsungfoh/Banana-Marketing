@@ -352,7 +352,19 @@ Copyright (c) 2024 The Pocket Company
 
 ## 📝 Recent Updates
 
-### v1.2.0 - Latest Changes (Aspect Ratio Fixes)
+### v1.3.0 - Latest Changes (UI/UX Improvements)
+- **Toolbar Layout Enhancements**:
+  - Added responsive gap between KFC Knowledge Graph button and project title
+  - Implemented proper spacing between toolbar sections (left, center, right)
+  - Enhanced mobile responsiveness with better element positioning
+  - Added visual separators between toolbar components
+
+- **Header Component Updates**:
+  - Fixed TypeScript interface for modal props (onShowQrModal, onShowApiModal)
+  - Improved component prop validation and type safety
+  - Enhanced error handling for modal interactions
+
+### v1.2.0 - Aspect Ratio Fixes
 - **Image Generation Improvements**:
   - Fixed aspect ratio validation and correction for generated images
   - Added automatic image cropping when aspect ratio doesn't match requested size

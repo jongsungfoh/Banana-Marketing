@@ -1533,7 +1533,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
             )}
           </div>
           
-          <div className="flex-1 flex justify-center">
+          <div className="flex-1 flex justify-center ml-8">
             {/* 项目名称编辑 - 开源版本保留但不储存 */}
             {isEditingName ? (
               <div className="flex items-center gap-2 max-w-md">
@@ -1684,10 +1684,10 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
               </div>
               <button
                 onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('showApiKeyModal'));
-                  }
-                }}
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('showApiKeyForm'));
+                }
+              }}
                 className="neu-button"
                 title="API Key Settings"
               >
