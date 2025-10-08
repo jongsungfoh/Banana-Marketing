@@ -496,9 +496,9 @@ a {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  /* 預設紅色磁鐵 */
+  /* 默认红色磁铁 */
   background: radial-gradient(ellipse at 25% 25%, #ff8a8a, #ff6b6b, #ee5a52, #dc3545);
-  /* 真實磁鐵光澤效果 */
+  /* 真实磁铁光泽效果 */
   box-shadow: 
     0 0 0 1px rgba(238, 90, 82, 0.5),
     0 6px 15px rgba(0, 0, 0, 0.4),
@@ -508,7 +508,7 @@ a {
     inset -4px 0 6px rgba(220, 53, 69, 0.8);
 }
 
-/* 磁鐵光澤高光條紋 */
+/* 磁铁光泽高光条纹 */
 .pushpin-node::after {
   content: '';
   position: absolute;
@@ -526,7 +526,7 @@ a {
     0 7px 2px -1px rgba(255, 255, 255, 0.4);
 }
 
-/* 產品節點 - 橘色磁鐵 */
+/* 产品节点 - 橙色磁铁 */
 .ink-box-yellow.pushpin-node::before {
   background: radial-gradient(ellipse at 25% 25%, #FFB380, #F4A261, #E8743B, #CC5500);
   box-shadow: 
@@ -538,7 +538,7 @@ a {
     inset -4px 0 6px rgba(204, 85, 0, 0.8);
 }
 
-/* 概念節點 - 綠色磁鐵 */
+/* 概念节点 - 绿色磁铁 */
 .ink-box-green.pushpin-node::before {
   background: radial-gradient(ellipse at 25% 25%, #4ADE80, #36AE7C, #2E8B68, #266B54);
   box-shadow: 
@@ -550,7 +550,7 @@ a {
     inset -4px 0 6px rgba(38, 107, 84, 0.8);
 }
 
-/* 生成節點 - 藍色磁鐵 */
+/* 生成节点 - 蓝色磁铁 */
 .ink-box-blue.pushpin-node::before {
   background: radial-gradient(ellipse at 25% 25%, #38BDF8, #187498, #125E7A, #0C495C);
   box-shadow: 

@@ -1771,7 +1771,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
         </ReactFlow>
       </div>
 
-      {/* 图片预览 Modal */}
+      {/* 图片预览模态框 */}
       <AnimatePresence>
         {previewImage && (
           <motion.div

@@ -18,20 +18,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (!prompt_data?.prompt) {
-      return NextResponse.json({ error: '缺少提示詞' }, { status: 400 });
+      return NextResponse.json({ error: '缺少提示词' }, { status: 400 });
     }
 
     // 使用用户提供的 API Key
     const genAI = new GoogleGenerativeAI(api_key);
     
-    // 使用 Gemini 2.5 Flash Image Preview 进行圖片生成
+    // 使用 Gemini 2.5 Flash Image Preview 进行图片生成
     const model = genAI.getGenerativeModel({ 
       model: "gemini-2.5-flash-image"
     });
 
     const { concept, prompt } = prompt_data;
 
-    // 载入圖片的通用函数（从 base64 URL）
+    // 载入图片的通用函数（从 base64 URL）
     const loadImagePart = async (imagePath: string, imageType: string) => {
       if (!imagePath) return null;
       
@@ -56,13 +56,13 @@ export async function POST(request: NextRequest) {
       }
     };
 
-    // 载入产品圖片（如果有）
+    // 载入产品图片（如果有）
     const productImagePart = await loadImagePart(product_image_path, 'product');
     
-    // 载入生成圖片（如果有）
+    // 载入生成图片（如果有）
     const generatedImagePart = await loadImagePart(generated_image_path, 'generated');
 
-    // 建立圖片生成提示詞
+    // 建立图片生成提示词
     const fullPrompt = `Create a professional advertising image: ${prompt}
 High-resolution, studio-lit product photograph with professional lighting setup.
 Ultra-realistic commercial photography style with sharp focus and clean composition.
@@ -71,10 +71,10 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
 
     console.log('🎨 Generating image with prompt:', fullPrompt);
 
-    // 準備内容
+    // 准备内容
     const content: any[] = [];
     
-    // 按順序添加圖片
+    // 按顺序添加图片
     if (productImagePart) {
       content.push(productImagePart);
     }
@@ -83,20 +83,20 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
       content.push(generatedImagePart);
     }
     
-    // 最后添加文字提示詞
+    // 最后添加文字提示词
     content.push({ text: fullPrompt });
 
-    // 生成圖片
+    // 生成图片
     const result = await model.generateContent(content);
     
     // 处理响应
     const response = await result.response;
     
-    // 檢查回应
+    // 检查回应
     if (!response || !response.candidates || response.candidates.length === 0) {
-      console.error('❌ API 沒有返回有效的回应');
+      console.error('❌ API 没有返回有效的回应');
       return NextResponse.json({ 
-        error: 'API 沒有返回有效的回应',
+        error: 'API 没有返回有效的回应',
         details: 'No candidates in response'
       }, { status: 500 });
     }
@@ -105,7 +105,7 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
     const candidateAny = candidate as any;
     const parts = candidate.content?.parts || candidateAny.parts || [];
 
-    console.log('🔍 回应結構:', {
+    console.log('🔍 回应结构:', {
       candidates: response.candidates.length,
       parts: parts.length,
       partsTypes: parts.map((part: any) => {
@@ -115,7 +115,7 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
       })
     });
 
-    // 尋找圖片回应
+    // 寻找图片回应
     const imagePart = parts.find((part: any) => part.inlineData);
     
     if (!imagePart || !imagePart.inlineData || !imagePart.inlineData.data) {
@@ -132,7 +132,7 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
     const imageBytes = imagePart.inlineData.data;
     const imageMimeType = imagePart.inlineData.mimeType || 'image/png';
 
-    console.log('✅ 成功生成圖片');
+    console.log('✅ 成功生成图片');
     
     return NextResponse.json({
       success: true,
