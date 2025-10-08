@@ -14,6 +14,9 @@ interface ProductNodeData {
   onAddConcept?: () => void;
   onDeleteClick?: (nodeId: string) => void;
   onTitleUpdate?: (nodeId: string, newTitle: string) => void;
+  onProductClick?: (nodeId: string) => void;
+  isLinkingMode?: boolean;
+  isSelected?: boolean;
 }
 
 interface ProductNodeProps {
@@ -66,6 +69,25 @@ export default function ProductNode({ data, id }: ProductNodeProps) {
   const MAX_TITLE_LENGTH = 25;
   const hash = hashCode(id + 'tag-rotation');
   const rotation = (seededRandom(hash) - 0.5) * 8;
+
+  const handleProductClick = () => {
+    console.log('🎯 ProductNode handleProductClick called', {
+      id,
+      isLinkingMode: data.isLinkingMode,
+      hasOnProductClick: !!data.onProductClick,
+      onProductClick: data.onProductClick
+    });
+    
+    if (data.isLinkingMode && data.onProductClick) {
+      console.log('✅ Calling onProductClick with id:', id);
+      data.onProductClick(id);
+    } else {
+      console.log('❌ Not calling onProductClick - conditions not met', {
+        isLinkingMode: data.isLinkingMode,
+        hasOnProductClick: !!data.onProductClick
+      });
+    }
+  };
 
   useEffect(() => {
     if (!isEditingTitle) {
@@ -125,9 +147,29 @@ export default function ProductNode({ data, id }: ProductNodeProps) {
     <motion.div
       initial={{ opacity: 0, scale: 0.8 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="neu-card ink-box-yellow pushpin-node relative group"
+      className={`neu-card ink-box-yellow pushpin-node relative group ${
+        data.isLinkingMode ? 'cursor-pointer' : ''
+      } ${
+        data.isSelected ? 'ring-4 ring-green-500 shadow-lg' : ''
+      } ${
+        data.isLinkingMode && data.isSelected ? 'scale-105 shadow-xl' : ''
+      }`}
       style={{ width: 300, height: 360 }}
+      onClick={handleProductClick}
     >
+      {/* Selection indicator */}
+      {data.isSelected && (
+        <div className="absolute top-2 right-2 z-10 bg-green-500 text-white rounded-full p-1">
+          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+          </svg>
+        </div>
+      )}
+
+      {/* Hover effect for linking mode */}
+      {data.isLinkingMode && !data.isSelected && (
+        <div className="absolute inset-0 bg-green-100 bg-opacity-20 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-200" />
+      )}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -244,7 +286,7 @@ export default function ProductNode({ data, id }: ProductNodeProps) {
       
       {data.status === 'generating' && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2">
-          <div className="w-3 h-3 border-2 border-yellow-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
         </div>
       )}
       

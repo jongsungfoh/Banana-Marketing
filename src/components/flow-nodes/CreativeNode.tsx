@@ -188,7 +188,7 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
       <div className="neu-image-container rounded-lg" style={{ height: '200px', marginTop: '0', marginBottom: '16px', marginLeft: '16px', marginRight: '16px', borderRadius: '16px' }}>
         {data.status === 'generating' ? (
           <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
-            <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
           </div>
         ) : data.imageUrl ? (
           <div className="relative w-full h-full rounded-lg overflow-hidden">

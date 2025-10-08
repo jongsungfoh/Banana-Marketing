@@ -26,6 +26,8 @@ Visit http://localhost:3003
 
 - ✅ **Product Image Upload & Analysis**
 - ✅ **AI Creative Concept Generation**
+- ✅ **Merge Multiple Images** *(Combine images with drag & drop reordering)*
+- ✅ **Add Merged Images as Products** *(Convert merged images to product nodes)*
 - ✅ **Knowledge Graph (Sample)**
 - ✅ **Node Drag & Connect**
 - ✅ **Neumorphism UI**
@@ -77,7 +79,15 @@ After upload, AI will automatically:
 - From product nodes: Click "+" button to add concept
 - From creative nodes: Click "+" button to add concept based on generated image
 
-### 6. Knowledge Graph
+### 6. Merge Images
+1. Click the "Merge Images" button in the toolbar
+2. Upload multiple images (2 or more)
+3. Drag & drop to reorder images
+4. Click "Merge Images" to combine them
+5. Choose to download the merged image OR add it as a product
+6. If adding as product: Click "Add Product" to analyze and create product node
+
+### 7. Knowledge Graph
 1. Click ✨ icon in bottom-right to open knowledge graph
 2. Browse KFC brand-related concept network
 3. Click any node to add as creative concept
@@ -178,6 +188,8 @@ npm run dev
 
 - ✅ **產品圖片上傳和分析**
 - ✅ **AI 創意概念生成**
+- ✅ **合併多張圖片** *(拖放重新排序組合圖片)*
+- ✅ **將合併圖片添加為產品** *(將合併圖片轉換為產品節點)*
 - ✅ **知識圖譜功能(範例)**
 - ✅ **節點拖拽和連接**
 - ✅ **Neumorphism UI**
@@ -229,7 +241,15 @@ npm run dev
 - 從產品節點：點擊「+」按鈕新增概念
 - 從創意節點：點擊「+」按鈕基於生成圖片新增概念
 
-### 6. 使用知識圖譜
+### 6. 合併圖片
+1. 點擊工具列的「合併圖片」按鈕
+2. 上傳多張圖片（2 張以上）
+3. 拖放重新排序圖片
+4. 點擊「合併圖片」進行組合
+5. 選擇下載合併圖片或添加為產品
+6. 若添加為產品：點擊「添加產品」進行分析並創建產品節點
+
+### 7. 使用知識圖譜
 1. 點擊工具列的知識圖譜按鈕開啟
 2. 瀏覽 KFC 品牌相關的概念網路
 3. 點擊任何節點將其新增為創意概念

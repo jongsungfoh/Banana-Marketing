@@ -27,6 +27,7 @@ import ProductNode from './flow-nodes/ProductNode';
 import ConceptNode from './flow-nodes/ConceptNode';
 import CreativeNode from './flow-nodes/CreativeNode';
 import OfficialVersionModal from './OfficialVersionModal';
+import ImageMergeButton from './ImageMergeButton';
 
 // Define node types outside component to prevent re-creation
 const nodeTypes: NodeTypes = {
@@ -1020,6 +1021,115 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
   }, [setEdges]);
 
 
+  // Handle product upload from URL (for merged images)
+  const handleProductUploadFromUrl = useCallback(async (imageUrl: string, fileName: string) => {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      console.error('API Key required');
+      return;
+    }
+
+    // Calculate new Product node position (within canvas, avoid overlap)
+    const existingProductNodes = nodesRef.current.filter(n => n.type === 'product');
+    const newPosition = {
+      x: 400 + (existingProductNodes.length * 500), // Center of canvas, horizontal arrangement
+      y: 100
+    };
+    
+    console.log('🆕 Adding new product from URL:', {
+      existingProductCount: existingProductNodes.length,
+      newPosition: newPosition,
+      fileName: fileName,
+      imageUrl: imageUrl.substring(0, 50) + '...'
+    });
+
+    // Call complete analysis flow, but specify new position
+    setIsAnalyzing(true);
+    setReasoningSteps([]);
+    setCurrentStep(-1);
+
+    try {
+      // Use the image URL directly
+      setProductImagePath(imageUrl);
+
+      // Create a FormData with the image URL
+      const formData = new FormData();
+      formData.append('image_url', imageUrl);
+      formData.append('language', currentLanguage);
+      formData.append('api_key', apiKey);
+
+      const response = await fetch('/api/analyze-product', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Update with API returned image URL (if different)
+        if (data.product_image_url) {
+          setProductImagePath(data.product_image_url);
+        }
+        
+        // Start reasoning simulation if we have steps
+        if (data.reasoning_steps && data.reasoning_steps.length > 0) {
+          console.log('🎯 Starting reasoning simulation for new product with', data.reasoning_steps.length, 'steps');
+          
+          const simulateReasoning = (steps: AnalysisStep[]) => {
+            console.log('🔧 Setting reasoning steps for new product:', steps);
+            setReasoningSteps([...steps]);
+            setCurrentStep(-1);
+            
+            let stepIndex = 0;
+            const showNextStep = () => {
+              if (stepIndex < steps.length) {
+                console.log(`🎯 Showing step ${stepIndex + 1}/${steps.length}:`, steps[stepIndex]);
+                setCurrentStep(stepIndex);
+                stepIndex++;
+                setTimeout(showNextStep, 1500);
+              } else {
+                console.log('🏁 All reasoning steps completed for new product');
+                setTimeout(() => {
+                  console.log('🎯 Creating additional product nodes...');
+                  
+                  // Create new product node (using calculated position)
+                  const analysisData = {
+                    summary: data.analysis || 'Product analyzed',
+                    creative_prompts: data.creative_prompts || [],
+                    reasoning_steps: data.reasoning_steps || []
+                  };
+                  
+                  createAdditionalProductFlow(analysisData, data.product_image_url || imageUrl, fileName, newPosition);
+                  setIsAnalyzing(false);
+                }, 3000);
+              }
+            };
+            
+            setTimeout(showNextStep, 100);
+          };
+          
+          simulateReasoning(data.reasoning_steps);
+        } else {
+          // If no reasoning steps, create node directly
+          const analysisData = {
+            summary: data.analysis || 'Product analyzed',
+            creative_prompts: data.creative_prompts || [],
+            reasoning_steps: data.reasoning_steps || []
+          };
+          createAdditionalProductFlow(analysisData, data.product_image_url || imageUrl, fileName, newPosition);
+          setIsAnalyzing(false);
+        }
+      } else {
+        console.error(data.error || 'Analysis failed');
+        setIsAnalyzing(false);
+      }
+    } catch (error) {
+      console.error('Failed to analyze new product:', error);
+      console.error('Error analyzing new product');
+      setIsAnalyzing(false);
+    }
+  }, [currentLanguage, getApiKey, createAdditionalProductFlow]);
+
   // Handle product upload with full analysis (for Add Product button)
   const handleSimpleProductUpload = useCallback(async (file: File) => {
     const apiKey = getApiKey();
@@ -1461,6 +1571,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
                 </div>
               </button>
             </div>
+
+            {/* Merge Images Button */}
+            <ImageMergeButton currentLanguage={currentLanguage} onAddProduct={handleProductUploadFromUrl} />
           </div>
         </div>
       </div>

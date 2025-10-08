@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import axios from 'axios';
 
 interface CreativeConcept {
   name: string;
@@ -16,11 +17,12 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const productImage = formData.get('product_image') as File;
+    const imageUrl = formData.get('image_url') as string;
     const language = formData.get('language') as string || 'zh-tw';
     const apiKey = formData.get('api_key') as string;
 
-    if (!productImage) {
-      return NextResponse.json({ error: '没有上传产品图片' }, { status: 400 });
+    if (!productImage && !imageUrl) {
+      return NextResponse.json({ error: '没有提供产品图片' }, { status: 400 });
     }
 
     if (!apiKey) {
@@ -33,10 +35,34 @@ export async function POST(request: NextRequest) {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
     console.log('✅ Gemini model initialized');
 
-    // 读取图片数据
-    const bytes = await productImage.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    const base64Image = buffer.toString('base64');
+    let base64Image: string;
+    let mimeType: string;
+    
+    if (productImage) {
+      // Handle file upload
+      const bytes = await productImage.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      base64Image = buffer.toString('base64');
+      mimeType = productImage.type || 'image/png';
+    } else if (imageUrl) {
+      // Handle URL-based image
+      console.log('🌐 Fetching image from URL:', imageUrl);
+      try {
+        const response = await axios.get(imageUrl, {
+          responseType: 'arraybuffer',
+          timeout: 10000 // 10 second timeout
+        });
+        const buffer = Buffer.from(response.data);
+        base64Image = buffer.toString('base64');
+        mimeType = response.headers['content-type'] || 'image/png';
+        console.log('✅ Image fetched successfully, size:', base64Image.length);
+      } catch (error) {
+        console.error('Failed to fetch image from URL:', error);
+        return NextResponse.json({ error: '无法从URL获取图片' }, { status: 400 });
+      }
+    } else {
+      return NextResponse.json({ error: '没有提供有效的图片' }, { status: 400 });
+    }
 
     const analysisPrompt = (language === 'zh' || language === 'zh-tw') 
       ? `用简体中文快速分析产品，提供5个创意概念，保持简洁。
@@ -83,7 +109,7 @@ JSON format:
     const imagePart = {
       inlineData: {
         data: base64Image,
-        mimeType: productImage.type || 'image/png'
+        mimeType: mimeType
       }
     };
 
@@ -143,7 +169,7 @@ JSON format:
     }
 
     // 将图片转换为 base64 URL 供前端使用
-    const productImageUrl = `data:${productImage.type};base64,${base64Image}`;
+    const productImageUrl = `data:${mimeType};base64,${base64Image}`;
 
     console.log('📊 Final response data:', {
       reasoning_steps_count: reasoningSteps.length,

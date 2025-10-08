@@ -341,7 +341,7 @@ export default function ConceptNode({ data, id }: ConceptNodeProps) {
       
       {data.status === 'generating' && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-full p-2">
-          <div className="w-3 h-3 border-2 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
         </div>
       )}
       
