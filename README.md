@@ -35,6 +35,8 @@ Visit http://localhost:3003
 - ✅ **Bilingual Support (EN/ZH)**
 - ✅ **Fully Local** *(Official Version provides cloud storage)*
 - ✅ **Hidden Feature: KFC Knowledge Graph** *(Click banana icon 5 times to unlock)*
+- ✅ **Mobile Responsive Toolbar** *(Horizontal scrolling for mobile devices)*
+- ✅ **API Key Management** *(Secure API key storage and management)*
 
 ## 📝 How to Get Gemini API Key
 
@@ -347,3 +349,31 @@ Copyright (c) 2024 The Pocket Company
 ---
 
 **Powered by The Pocket Company**
+
+## 📝 Recent Updates
+
+### v1.1.0 - Latest Changes
+- **UI Improvements**:
+  - Updated branding from "Banana Editor - Open Source" to "Banana Marketing - Lush Cloud AI"
+  - Simplified toolbar button texts ("Add Product" → "Add", "Merge Images" → "Merge")
+  - Streamlined platform ratio selector by removing preset selection
+  - Added "Powered by The Pocket Company" branding
+
+- **Mobile Enhancements**:
+  - Implemented horizontal scrolling for toolbar on mobile devices
+  - Added API Key modal for better mobile experience
+  - Improved responsive design for smaller screens
+
+- **New Features**:
+  - Enhanced API Key management with secure local storage
+  - Added mobile-friendly toolbar with scrollable interface
+  - Improved internationalization support
+
+### Previous Features
+- Product image upload and AI analysis
+- Creative concept generation with Gemini AI
+- Image merging with drag-and-drop functionality
+- Knowledge graph integration
+- Project save/load functionality
+- Bilingual support (English/Chinese)
+- Hidden KFC knowledge graph feature

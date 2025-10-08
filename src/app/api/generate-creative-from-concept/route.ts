@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
       product_image_path, 
       generated_image_path,
       size = '1:1',
+      platform = 'instagram',
+      preset,
       language = 'zh',
       api_key 
     } = body;
@@ -21,13 +23,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: '缺少提示词' }, { status: 400 });
     }
 
-    // 使用用户提供的 API Key
-    const genAI = new GoogleGenerativeAI(api_key);
-    
-    // 使用 Gemini 2.5 Flash Image Preview 进行图片生成
-    const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash-image"
-    });
+    // 使用新 SDK 生成图片
+    const ai = new GoogleGenAI({ apiKey: api_key });
 
     const { concept, prompt } = prompt_data;
 
@@ -62,14 +59,23 @@ export async function POST(request: NextRequest) {
     // 载入生成图片（如果有）
     const generatedImagePart = await loadImagePart(generated_image_path, 'generated');
 
-    // 建立图片生成提示词
-    const fullPrompt = `Create a professional advertising image: ${prompt}
+    // 建立图片生成提示词，包含平台和预设信息
+    const platformInfo = preset ? `${preset.name} (${platform})` : `${platform} (${size})`;
+    const formatInfo = size === '1:1' ? 'Square format' : 
+                      size === '16:9' ? 'Landscape format' : 
+                      size === '9:16' ? 'Portrait format' : 
+                      size === '4:5' ? 'Portrait 4:5 format' : `Format: ${size}`;
+    
+    const fullPrompt = `Create a professional advertising image for ${platformInfo}: ${prompt}
 High-resolution, studio-lit product photograph with professional lighting setup.
 Ultra-realistic commercial photography style with sharp focus and clean composition.
 Product prominently displayed with attention to detail and visual impact.
-${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size === '9:16' ? 'Portrait format' : 'Format: ' + size}`;
+${formatInfo}. 
+Aspect ratio: ${size} (important: maintain this exact aspect ratio).
+Optimized for ${platform} platform specifications and best practices.`;
 
     console.log('🎨 Generating image with prompt:', fullPrompt);
+    console.log('📐 Aspect ratio configuration:', size);
 
     // 准备内容
     const content: any[] = [];
@@ -86,14 +92,20 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
     // 最后添加文字提示词
     content.push({ text: fullPrompt });
 
-    // 生成图片
-    const result = await model.generateContent(content);
+    // 生成图片 - 使用新 SDK 语法
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: content,
+      config: {
+        responseModalities: ['TEXT', 'IMAGE'],
+        imageConfig: {
+          aspectRatio: size
+        }
+      }
+    });
     
-    // 处理响应
-    const response = await result.response;
-    
-    // 检查回应
-    if (!response || !response.candidates || response.candidates.length === 0) {
+    // 处理响应 - 新 SDK 结构
+    if (!result.candidates || result.candidates.length === 0) {
       console.error('❌ API 没有返回有效的回应');
       return NextResponse.json({ 
         error: 'API 没有返回有效的回应',
@@ -101,12 +113,11 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
       }, { status: 500 });
     }
 
-    const candidate = response.candidates[0];
-    const candidateAny = candidate as any;
-    const parts = candidate.content?.parts || candidateAny.parts || [];
+    const candidate = result.candidates[0];
+    const parts = candidate.content?.parts || [];
 
     console.log('🔍 回应结构:', {
-      candidates: response.candidates.length,
+      candidates: result.candidates.length,
       parts: parts.length,
       partsTypes: parts.map((part: any) => {
         if (part.text) return 'text';
@@ -138,7 +149,10 @@ ${size === '1:1' ? 'Square format' : size === '16:9' ? 'Landscape format' : size
       success: true,
       image_url: `data:${imageMimeType};base64,${imageBytes}`,
       concept: concept,
-      prompt: prompt
+      prompt: prompt,
+      platform: platform,
+      size: size,
+      preset: preset
     });
 
   } catch (error) {

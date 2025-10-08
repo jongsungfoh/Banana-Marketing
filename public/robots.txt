@@ -1,4 +1,4 @@
-# Banana Editor - Open Source
+# Banana Marketing - Lush Cloud AI
 User-agent: *
 Allow: /
 

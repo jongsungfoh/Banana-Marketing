@@ -6,7 +6,7 @@ import 'reactflow/dist/style.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Banana Editor - Open Source',
+  title: 'Banana Marketing - Lush Cloud AI',
   description: 'AI 创意编辑器开源版本 - 使用您自己的 Gemini API Key',
   keywords: ['AI', '图片生成', 'Gemini', '开源', 'Editor'],
 }

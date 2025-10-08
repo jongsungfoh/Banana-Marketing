@@ -28,6 +28,7 @@ import ConceptNode from './flow-nodes/ConceptNode';
 import CreativeNode from './flow-nodes/CreativeNode';
 import OfficialVersionModal from './OfficialVersionModal';
 import ImageMergeButton from './ImageMergeButton';
+import PlatformRatioSelector from './PlatformRatioSelector';
 
 // Define node types outside component to prevent re-creation
 const nodeTypes: NodeTypes = {
@@ -130,6 +131,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
   
   // Official Version Modal
   const [showOfficialModal, setShowOfficialModal] = useState(false);
+
+  // Platform and ratio selection
+  const [currentPlatformPreset, setCurrentPlatformPreset] = useState<any>(null);
   
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -145,6 +149,29 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         setCurrentLanguage(savedLanguage);
       }
     }
+
+    // Listen for mobile control events
+    const handleTriggerLoadCanvas = () => {
+      handleLoadCanvas();
+    };
+
+    const handleTriggerAddProduct = () => {
+      setShowProductUpload(true);
+    };
+
+    const handleTriggerSaveCanvas = () => {
+      handleSaveCanvas();
+    };
+
+    window.addEventListener('triggerLoadCanvas', handleTriggerLoadCanvas);
+    window.addEventListener('triggerAddProduct', handleTriggerAddProduct);
+    window.addEventListener('triggerSaveCanvas', handleTriggerSaveCanvas);
+
+    return () => {
+      window.removeEventListener('triggerLoadCanvas', handleTriggerLoadCanvas);
+      window.removeEventListener('triggerAddProduct', handleTriggerAddProduct);
+      window.removeEventListener('triggerSaveCanvas', handleTriggerSaveCanvas);
+    };
   }, []);
 
   // 监听语言变化
@@ -347,6 +374,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         status: 'generating',
         concept: conceptNode.data.concept,
         parentConceptId: conceptNode.id, // ✅ 设置父 Concept ID，用于追溯产品来源
+        platform: currentPlatformPreset?.platform || 'instagram',
+        size: currentPlatformPreset?.ratio || '1:1',
+        preset: currentPlatformPreset?.name || null,
         onImageClick: stableHandleImageClick,
         onDeleteClick: stableHandleDeleteClick,
         onAddConcept: () => handleAddConceptFromCreative(creativeNodeId),
@@ -396,7 +426,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         },
         product_image_path: productImagePath, // 智能选择的产品图片
         generated_image_path: parentGeneratedImagePath, // 包含 parent Generated 图片（如果存在）
-        size: '1:1',
+        size: currentPlatformPreset?.ratio || '1:1',
+        platform: currentPlatformPreset?.platform || 'instagram',
+        preset: currentPlatformPreset?.name || null,
         language: currentLanguage === 'zh-cn' ? 'zh' : 'en',
         api_key: apiKey
       };
@@ -471,7 +503,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         return node;
       }));
     }
-  }, [currentLanguage, getApiKey, stableHandleImageClick, stableHandleDeleteClick, stableHandleTitleUpdate]);
+  }, [currentLanguage, getApiKey, stableHandleImageClick, stableHandleDeleteClick, stableHandleTitleUpdate, currentPlatformPreset]);
 
   // Generate image function that calls executeGenerateImage
   const stableHandleGenerateImage = useCallback((conceptId: string) => {
@@ -1426,12 +1458,17 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
       />
 
       {/* Project Toolbar */}
-      <div className="sticky top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm">
-        <div className="flex items-center justify-between px-6 py-2">
-          <div className="flex-1 flex items-center">
+      <div className="sticky top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm overflow-x-auto">
+        <div className="flex items-center justify-between px-6 py-2 min-w-max">
+          <div className="flex-1 flex items-center gap-4">
+            {/* Platform and Ratio Selector - Moved to left side */}
+            <div className="flex-shrink-0">
+              <PlatformRatioSelector onPresetSelect={setCurrentPlatformPreset} />
+            </div>
+            
             {/* Knowledge Graph Button - 只在showKnowledgeGraphButton为true时显示 */}
             {showKnowledgeGraphButton && (
-              <div className="neu-button-container">
+              <div className="neu-button-container block">
                 <div className="neu-button-label">
                   {currentLanguage === 'zh-cn' ? 'KFC知识图谱' : 'KFC Knowledge Graph'}
                 </div>
@@ -1543,7 +1580,7 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
             {/* Add Product Button */}
             <div className="neu-button-container">
               <div className="neu-button-label">
-                {currentLanguage === 'zh-cn' ? '新增产品' : 'Add Product'}
+                {currentLanguage === 'zh-cn' ? '新增' : 'Add'}
               </div>
               <button
                 onClick={() => setShowProductUpload(true)}
@@ -1595,6 +1632,30 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
 
             {/* Merge Images Button */}
             <ImageMergeButton currentLanguage={currentLanguage} onAddProduct={handleProductUploadFromUrl} />
+
+            {/* API Key Button */}
+            <div className="neu-button-container">
+              <div className="neu-button-label">
+                API Key
+              </div>
+              <button
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('showApiKeyModal'));
+                  }
+                }}
+                className="neu-button"
+                title="API Key Settings"
+              >
+                <div className="neu-button-outer">
+                  <div className="neu-button-inner">
+                    <svg className="neu-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </div>

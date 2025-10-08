@@ -11,6 +11,8 @@ function EditorContent() {
   const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-cn'>('en-us');
   const [bananaClickCount, setBananaClickCount] = useState(0);
   const [showKnowledgeGraphButton, setShowKnowledgeGraphButton] = useState(false);
+  const [showMergeImagesModal, setShowMergeImagesModal] = useState(false);
+  const [showPlatformSizeModal, setShowPlatformSizeModal] = useState(false);
 
   // 监听QR码弹窗事件
   useEffect(() => {
@@ -45,6 +47,33 @@ function EditorContent() {
       // 重置计数器
       setBananaClickCount(0);
     }
+  };
+
+  // Mobile control handlers
+  const handleLoadClick = () => {
+    // Trigger load functionality through canvas component
+    const event = new CustomEvent('triggerLoadCanvas');
+    window.dispatchEvent(event);
+  };
+
+  const handleAddProductClick = () => {
+    // Trigger add product functionality through canvas component
+    const event = new CustomEvent('triggerAddProduct');
+    window.dispatchEvent(event);
+  };
+
+  const handleSaveClick = () => {
+    // Trigger save functionality through canvas component
+    const event = new CustomEvent('triggerSaveCanvas');
+    window.dispatchEvent(event);
+  };
+
+  const handleMergeImagesClick = () => {
+    setShowMergeImagesModal(true);
+  };
+
+  const handlePlatformSizeClick = () => {
+    setShowPlatformSizeModal(true);
   };
 
   // 清理事件监听器
@@ -83,7 +112,15 @@ function EditorContent() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--neu-bg)' }}>
-      <Header onBananaClick={handleBananaClick} />
+      <Header 
+        onBananaClick={handleBananaClick}
+        onLoadClick={handleLoadClick}
+        onAddProductClick={handleAddProductClick}
+        onSaveClick={handleSaveClick}
+        onMergeImagesClick={handleMergeImagesClick}
+        onPlatformSizeClick={handlePlatformSizeClick}
+        showMobileControls={true}
+      />
       
       {/* Full Width Canvas */}
       <section className="h-[calc(100vh-64px)]">

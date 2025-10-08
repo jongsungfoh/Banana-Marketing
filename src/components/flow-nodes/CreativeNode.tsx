@@ -151,6 +151,14 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
           CREATIVE
         </div>
         
+        {/* Platform and Ratio Info */}
+        {data.platform && data.size && (
+          <div className="text-xs text-gray-600 bg-white/80 rounded-lg px-2 py-1 shadow-sm">
+            <div className="font-semibold">{data.platform}</div>
+            <div className="text-gray-500">{data.size}</div>
+          </div>
+        )}
+        
         <div className="neu-toolbar-blue" style={{ position: 'relative', top: 0, right: 0 }}>
           <button onClick={() => data.onAddConcept?.()} className="neu-button-circle-blue" title="Add Concept">
             <div style={{ filter: 'drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3))' }}>
