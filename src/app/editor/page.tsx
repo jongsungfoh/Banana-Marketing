@@ -9,6 +9,8 @@ function EditorContent() {
   const [showQrModal, setShowQrModal] = useState(false);
   const [showApiModal, setShowApiModal] = useState(false);
   const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-cn'>('en-us');
+  const [bananaClickCount, setBananaClickCount] = useState(0);
+  const [showKnowledgeGraphButton, setShowKnowledgeGraphButton] = useState(false);
 
   // 监听QR码弹窗事件
   useEffect(() => {
@@ -31,6 +33,27 @@ function EditorContent() {
         setCurrentLanguage(savedLanguage);
       }
     }
+  }, []);
+
+  // 处理香蕉点击事件
+  const handleBananaClick = () => {
+    const newCount = bananaClickCount + 1;
+    setBananaClickCount(newCount);
+    
+    if (newCount >= 5) {
+      setShowKnowledgeGraphButton(true);
+      // 重置计数器
+      setBananaClickCount(0);
+    }
+  };
+
+  // 清理事件监听器
+  useEffect(() => {
+    const handleShowQrModal = () => setShowQrModal(true);
+    const handleShowApiInfoModal = () => setShowApiModal(true);
+    const handleLanguageChange = (e: CustomEvent) => {
+      setCurrentLanguage(e.detail);
+    };
     
     return () => {
       window.removeEventListener('showQrModal', handleShowQrModal);
@@ -60,11 +83,11 @@ function EditorContent() {
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--neu-bg)' }}>
-      <Header />
+      <Header onBananaClick={handleBananaClick} />
       
       {/* Full Width Canvas */}
       <section className="h-[calc(100vh-64px)]">
-        <AdCreativeCanvasReactFlow />
+        <AdCreativeCanvasReactFlow showKnowledgeGraphButton={showKnowledgeGraphButton} />
       </section>
 
       {/* Touch N Go QR Code Modal - 现在在主内容区域 */}

@@ -39,6 +39,7 @@ const nodeTypes: NodeTypes = {
 // Interface definitions
 interface AdCreativeCanvasProps {
   projectId?: string | null;
+  showKnowledgeGraphButton?: boolean;
 }
 
 interface AnalysisStep {
@@ -58,7 +59,7 @@ interface ProductAnalysis {
   reasoning_steps: AnalysisStep[];
 }
 
-function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCreativeCanvasProps) {
+function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKnowledgeGraphButton = false }: AdCreativeCanvasProps & { showKnowledgeGraphButton?: boolean }) {
   // React Flow states
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
@@ -1428,7 +1429,27 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null }: AdCre
       <div className="sticky top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between px-6 py-2">
           <div className="flex-1 flex items-center">
-            {/* Knowledge Graph Button removed for open source version */}
+            {/* Knowledge Graph Button - 只在showKnowledgeGraphButton为true时显示 */}
+            {showKnowledgeGraphButton && (
+              <div className="neu-button-container">
+                <div className="neu-button-label">
+                  {currentLanguage === 'zh-cn' ? 'KFC知识图谱' : 'KFC Knowledge Graph'}
+                </div>
+                <button
+                  onClick={() => setShowKnowledgeGraph(true)}
+                  className="neu-button"
+                  title={currentLanguage === 'zh-cn' ? '打开KFC知识图谱' : 'Open KFC Knowledge Graph'}
+                >
+                  <div className="neu-button-outer">
+                    <div className="neu-button-inner">
+                      <svg className="neu-button-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            )}
           </div>
           
           <div className="flex-1 flex justify-center">

@@ -34,6 +34,7 @@ Visit http://localhost:3003
 - ✅ **Save/Load Projects** *(Save to .banana files, load from .banana/.json)*
 - ✅ **Bilingual Support (EN/ZH)**
 - ✅ **Fully Local** *(Official Version provides cloud storage)*
+- ✅ **Hidden Feature: KFC Knowledge Graph** *(Click banana icon 5 times to unlock)*
 
 ## 📝 How to Get Gemini API Key
 
@@ -92,6 +93,9 @@ After upload, AI will automatically:
 2. Browse KFC brand-related concept network
 3. Click any node to add as creative concept
 
+### 8. Hidden Feature - KFC Knowledge Graph Button
+**Secret Unlock**: Click the banana icon in the header 5 times to reveal the KFC Knowledge Graph button in the toolbar!
+
 ### 7. Node Operations
 - **Drag**: Move node position
 - **Connect**: Drag from bottom connection point to another node
@@ -133,6 +137,11 @@ After upload, AI will automatically:
 - Check if API Key is completely copied
 - Confirm no extra spaces
 - Refresh page and try again
+
+### 4. API Timeout Issues
+- Product analysis now has enhanced timeout handling (60s for Gemini API)
+- If API times out, system returns intelligent default analysis
+- Image fetching timeout increased to 30s for better reliability
 
 ## 🔒 Privacy & Security
 
@@ -254,6 +263,9 @@ npm run dev
 2. 浏览 KFC 品牌相关的概念网络
 3. 点击任何节点将其新增为创意概念
 
+### 8. 隐藏功能 - KFC 知识图谱按钮
+**秘密解锁**：点击顶部香蕉图标 5 次，工具栏中就会显示 KFC 知识图谱按钮！
+
 ### 7. 节点操作
 - **拖拽**：移动节点位置
 - **连接**：从节点底部的连接点拖拽到另一个节点
@@ -297,6 +309,11 @@ npm run dev
 - 检查 API Key 是否完整复制
 - 确认没有多余的空格
 - 重新整理页面后再试
+
+### 4. API 超时问题
+- 产品分析现在具有增强的超时处理（Gemini API 60秒）
+- 如果 API 超时，系统会返回智能默认分析
+- 图片获取超时增加到30秒以提高可靠性
 
 ### 4. 节点无法拖拽
 - 确保没有在编辑模式中

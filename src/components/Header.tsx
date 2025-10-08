@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { LanguageIcon } from '@heroicons/react/24/outline'
 
-export default function Header() {
+export default function Header({ onBananaClick }: { onBananaClick?: () => void }) {
   const [apiKey, setApiKey] = useState<string>('')
   const [isApiKeyVisible, setIsApiKeyVisible] = useState(false)
   const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-cn'>('en-us')
@@ -69,13 +69,14 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Left Side - Logo */}
           <motion.div 
-            className="flex items-center space-x-3"
+            className="flex items-center space-x-3 cursor-pointer"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
+            onClick={onBananaClick}
           >
             <div className="relative">
-              <span className="text-3xl animate-float">🍌</span>
+              <span className="text-3xl animate-float select-none">🍌</span>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-banana-400 to-banana-500 rounded-full animate-pulse"></div>
             </div>
             <div className="relative">
