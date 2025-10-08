@@ -48,12 +48,18 @@ export default function Header() {
     'en-us': {
       apiKeyPlaceholder: 'Enter your Gemini API Key',
       showKey: 'Show',
-      hideKey: 'Hide'
+      hideKey: 'Hide',
+      touchNGoTitle: 'Touch N Go Payment',
+      qrCodeInstruction: 'If you like it, you can leave a tip and share your thoughts.',
+      closeButton: 'Close'
     },
     'zh-cn': {
       apiKeyPlaceholder: '输入您的 Gemini API Key',
       showKey: '显示',
-      hideKey: '隐藏'
+      hideKey: '隐藏',
+      touchNGoTitle: 'Touch N Go 支付',
+      qrCodeInstruction: '如果你喜欢，可以打赏留言，留下你的心得。',
+      closeButton: '关闭'
     }
   }
 
@@ -72,16 +78,40 @@ export default function Header() {
               <span className="text-3xl animate-float">🍌</span>
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-banana-400 to-banana-500 rounded-full animate-pulse"></div>
             </div>
-            <div>
+            <div className="relative">
               <div className="flex items-center gap-2">
                 <h1 className="text-xl font-bold gradient-text">Banana Marketing</h1>
               </div>
-      
+              <p className="text-xs text-gray-500 opacity-30 mt-1">
+                Powered by The Pocket Company
+              </p>
             </div>
           </motion.div>
 
-          {/* Right Side - Language, API Key Input */}
+          {/* Right Side - Language, API Key Input, Touch N Go */}
           <div className="flex items-center space-x-4">
+            {/* Touch N Go Button */}
+            <motion.button
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('showQrModal'));
+                }
+              }}
+              className="flex items-center justify-center w-10 h-10 bg-white hover:bg-gray-50 rounded-lg transition-all duration-200 shadow-lg border border-gray-200 p-0"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              title="Touch N Go Payment"
+            >
+              <img 
+                src="/Touch_'n_Go_eWallet_logo.svg" 
+                alt="Touch N Go" 
+                className="w-full h-full object-contain rounded-lg"
+              />
+            </motion.button>
+            
             {/* Language Toggle Button */}
             <motion.button
               onClick={toggleLanguage}
@@ -110,10 +140,24 @@ export default function Header() {
               />
               <button
                 onClick={() => setIsApiKeyVisible(!isApiKeyVisible)}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"
+                className="absolute right-8 top-1/2 transform -translate-y-1/2 text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-100"
               >
                 {isApiKeyVisible ? t[currentLanguage].hideKey : t[currentLanguage].showKey}
               </button>
+              {/* API Info Button - 只在API密钥为空时显示 */}
+              {!apiKey && (
+                <button
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      window.dispatchEvent(new CustomEvent('showApiInfoModal'));
+                    }
+                  }}
+                  className="absolute right-0 top-1/2 transform -translate-y-1/2 w-5 h-5 bg-gray-500 hover:bg-gray-600 text-white text-xs font-bold rounded-full flex items-center justify-center transition-colors duration-200"
+                  title="API Information"
+                >
+                  !
+                </button>
+              )}
             </div>
 
 
