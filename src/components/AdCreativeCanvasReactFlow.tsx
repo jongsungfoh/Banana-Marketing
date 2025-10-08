@@ -132,8 +132,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
   // Official Version Modal
   const [showOfficialModal, setShowOfficialModal] = useState(false);
 
-  // Platform and ratio selection
-  const [currentPlatformPreset, setCurrentPlatformPreset] = useState<any>(null);
+  // Ratio selection only - no platform dependencies
+  const [currentRatio, setCurrentRatio] = useState<string>('1:1');
+  const [currentDimensions, setCurrentDimensions] = useState({width: 1080, height: 1080});
   
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -374,9 +375,9 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         status: 'generating',
         concept: conceptNode.data.concept,
         parentConceptId: conceptNode.id, // ✅ 设置父 Concept ID，用于追溯产品来源
-        platform: currentPlatformPreset?.platform || 'instagram',
-        size: currentPlatformPreset?.ratio || '1:1',
-        preset: currentPlatformPreset?.name || null,
+        platform: 'custom',
+        size: currentRatio,
+        preset: `Custom ${currentRatio}`,
         onImageClick: stableHandleImageClick,
         onDeleteClick: stableHandleDeleteClick,
         onAddConcept: () => handleAddConceptFromCreative(creativeNodeId),
@@ -426,12 +427,16 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         },
         product_image_path: productImagePath, // 智能选择的产品图片
         generated_image_path: parentGeneratedImagePath, // 包含 parent Generated 图片（如果存在）
-        size: currentPlatformPreset?.ratio || '1:1',
-        platform: currentPlatformPreset?.platform || 'instagram',
-        preset: currentPlatformPreset?.name || null,
+        size: currentRatio,
+        platform: 'custom',
+        preset: `Custom ${currentRatio}`,
         language: currentLanguage === 'zh-cn' ? 'zh' : 'en',
         api_key: apiKey
       };
+      
+      // Debug: Log the current ratio being sent
+      console.log('🎯 executeGenerateImage: currentRatio being sent:', currentRatio);
+      console.log('🎯 executeGenerateImage: requestData.size:', requestData.size);
       
       // Debug: Print the prompt being sent
       console.log('🎨 Generating image with data:', {
@@ -503,14 +508,45 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
         return node;
       }));
     }
-  }, [currentLanguage, getApiKey, stableHandleImageClick, stableHandleDeleteClick, stableHandleTitleUpdate, currentPlatformPreset]);
+  }, [currentLanguage, getApiKey, stableHandleImageClick, stableHandleDeleteClick, stableHandleTitleUpdate, currentRatio]);
 
   // Generate image function that calls executeGenerateImage
   const stableHandleGenerateImage = useCallback((conceptId: string) => {
     // 直接生成图片，跳过确认modal
     console.log('🎨 Generating image directly without confirmation modal');
+    console.log('🎯 stableHandleGenerateImage: currentRatio at call time:', currentRatio);
+    console.log('🎯 stableHandleGenerateImage: timestamp:', new Date().toISOString());
     executeGenerateImage(conceptId);
-  }, [executeGenerateImage]);
+  }, [executeGenerateImage]); // Remove currentRatio from dependencies since executeGenerateImage already handles it
+
+  // Update nodes with latest currentRatio and function references
+  useEffect(() => {
+    console.log('🎯 currentRatio state changed to:', currentRatio);
+    
+    // Update all concept nodes with the new currentRatio
+    setNodes(prev => prev.map(node => {
+      if (node.type === 'concept') {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            onGenerateClick: stableHandleGenerateImage, // Update with latest function reference
+          }
+        };
+      }
+      if (node.type === 'creative') {
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            size: currentRatio,
+            preset: `Custom ${currentRatio}`,
+          }
+        };
+      }
+      return node;
+    }));
+  }, [currentRatio, stableHandleGenerateImage]);
 
   // 从 Creative 节点新增概念
   const handleAddConceptFromCreative = useCallback((creativeId: string) => {
@@ -1463,7 +1499,15 @@ function AdCreativeCanvasReactFlow({ projectId: initialProjectId = null, showKno
           <div className="flex-1 flex items-center gap-4">
             {/* Platform and Ratio Selector - Moved to left side */}
             <div className="flex-shrink-0">
-              <PlatformRatioSelector onPresetSelect={setCurrentPlatformPreset} />
+              <PlatformRatioSelector 
+                onRatioSelect={(ratio, dimensions) => {
+                  console.log('🎯 PlatformRatioSelector onRatioSelect called with:', ratio, dimensions);
+                  console.log('🎯 PlatformRatioSelector timestamp:', new Date().toISOString());
+                  setCurrentRatio(ratio);
+                  setCurrentDimensions(dimensions);
+                }}
+                currentRatio={currentRatio}
+              />
             </div>
             
             {/* Knowledge Graph Button - 只在showKnowledgeGraphButton为true时显示 */}

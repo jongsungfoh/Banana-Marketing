@@ -14,7 +14,19 @@ interface ReasoningStep {
 }
 
 export async function POST(request: NextRequest) {
+  // Add CORS headers
+  const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
   try {
+    // Handle preflight OPTIONS request
+    if (request.method === 'OPTIONS') {
+      return NextResponse.json({}, { headers: corsHeaders });
+    }
+
     const formData = await request.formData();
     const productImage = formData.get('product_image') as File;
     const imageUrl = formData.get('image_url') as string;
@@ -22,11 +34,11 @@ export async function POST(request: NextRequest) {
     const apiKey = formData.get('api_key') as string;
 
     if (!productImage && !imageUrl) {
-      return NextResponse.json({ error: '没有提供产品图片' }, { status: 400 });
+      return NextResponse.json({ error: '没有提供产品图片' }, { status: 400, headers: corsHeaders });
     }
 
     if (!apiKey) {
-      return NextResponse.json({ error: '需要提供 API Key' }, { status: 400 });
+      return NextResponse.json({ error: '需要提供 API Key' }, { status: 400, headers: corsHeaders });
     }
 
     // 使用用户提供的 API Key
@@ -60,10 +72,10 @@ export async function POST(request: NextRequest) {
         console.log('✅ Image fetched successfully, size:', base64Image.length);
       } catch (error) {
         console.error('Failed to fetch image from URL:', error);
-        return NextResponse.json({ error: '无法从URL获取图片' }, { status: 400 });
+        return NextResponse.json({ error: '无法从URL获取图片' }, { status: 400, headers: corsHeaders });
       }
     } else {
-      return NextResponse.json({ error: '没有提供有效的图片' }, { status: 400 });
+      return NextResponse.json({ error: '没有提供有效的图片' }, { status: 400, headers: corsHeaders });
     }
 
     const analysisPrompt = (language === 'zh' || language === 'zh-tw') 
@@ -162,7 +174,7 @@ JSON format:
         reasoning_steps: defaultResponse.reasoning_steps,
         product_image_url: `data:${mimeType};base64,${base64Image}`,
         warning: 'API调用遇到问题，返回智能默认分析结果'
-      });
+      }, { headers: corsHeaders });
     }
     
     const response = await result.response;
@@ -223,7 +235,7 @@ JSON format:
       creative_prompts: creativePrompts,
       reasoning_steps: reasoningSteps,
       product_image_url: productImageUrl
-    });
+    }, { headers: corsHeaders });
 
   } catch (error) {
     console.error('分析产品时发生错误:', error);
@@ -232,7 +244,7 @@ JSON format:
         error: '分析产品时发生错误',
         details: (error as Error)?.message || 'Unknown error'
       },
-      { status: 500 }
+      { status: 500, headers: corsHeaders }
     );
   }
 }

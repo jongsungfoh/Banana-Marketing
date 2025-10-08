@@ -286,7 +286,7 @@ export default function Header({
                       }}
                       className="w-full px-3 py-2 text-sm bg-orange-50 hover:bg-orange-100 text-orange-700 rounded-md transition-colors duration-200 text-left"
                     >
-                      📐 {currentLanguage === 'en-us' ? 'Platform & Size' : '平台与尺寸'}
+                      📐 {currentLanguage === 'en-us' ? 'Format' : '格式'}
                     </button>
                   </div>
                 )}

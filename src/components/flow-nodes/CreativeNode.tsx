@@ -5,6 +5,12 @@ import { Handle, Position } from 'reactflow';
 import { motion } from 'framer-motion';
 import { hashCode, seededRandom } from '@/utils/handdrawnStyles';
 
+// Helper function to calculate aspect ratio padding percentage
+const getAspectRatioPadding = (ratio: string): string => {
+  const [width, height] = ratio.split(':').map(Number);
+  return `${(height / width) * 100}%`;
+};
+
 interface CreativeNodeData {
   title: string;
   content: string;
@@ -64,7 +70,9 @@ const TitleEditIcon = () => (
 export default function CreativeNode({ data, id }: CreativeNodeProps) {
   const [isEditingTitle, setIsEditingTitle] = useState(false);
   const [editTitle, setEditTitle] = useState(data.title);
+  const [imageDimensions, setImageDimensions] = useState<{width: number, height: number} | null>(null);
   const titleRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   
   const MAX_TITLE_LENGTH = 25;
   const hash = hashCode(id + 'tag-rotation');
@@ -151,11 +159,10 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
           CREATIVE
         </div>
         
-        {/* Platform and Ratio Info */}
-        {data.platform && data.size && (
+        {/* Ratio Info */}
+        {data.size && (
           <div className="text-xs text-gray-600 bg-white/80 rounded-lg px-2 py-1 shadow-sm">
-            <div className="font-semibold">{data.platform}</div>
-            <div className="text-gray-500">{data.size}</div>
+            <div className="font-semibold">{data.size}</div>
           </div>
         )}
         
@@ -193,17 +200,34 @@ export default function CreativeNode({ data, id }: CreativeNodeProps) {
         </motion.div>
       )}
       
-      <div className="neu-image-container rounded-lg" style={{ height: '200px', marginTop: '0', marginBottom: '16px', marginLeft: '16px', marginRight: '16px', borderRadius: '16px' }}>
+      <div className="neu-image-container rounded-lg" style={{ 
+        marginTop: '0', 
+        marginBottom: '16px', 
+        marginLeft: '16px', 
+        marginRight: '16px', 
+        borderRadius: '16px',
+        aspectRatio: imageDimensions ? `${imageDimensions.width} / ${imageDimensions.height}` : 'auto'
+      }}>
         {data.status === 'generating' ? (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
+          <div className="w-full h-48 flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg">
             <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
           </div>
         ) : data.imageUrl ? (
-          <div className="relative w-full h-full rounded-lg overflow-hidden">
+          <div className="relative w-full rounded-lg overflow-hidden">
             <img
+              ref={imgRef}
               src={data.imageUrl}
               alt={data.title}
-              className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+              className="w-full h-auto object-contain cursor-pointer hover:opacity-80 transition-opacity"
+              onLoad={(e) => {
+                const img = e.target as HTMLImageElement;
+                if (img.naturalWidth && img.naturalHeight) {
+                  setImageDimensions({
+                    width: img.naturalWidth,
+                    height: img.naturalHeight
+                  });
+                }
+              }}
               onClick={() => {
                 // 创建带水印的图片用于预览
                 const canvas = document.createElement('canvas');

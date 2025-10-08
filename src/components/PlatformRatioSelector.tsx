@@ -1,22 +1,34 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { PLATFORM_PRESETS, PlatformPreset, getAvailablePlatforms, getRatiosByPlatform, getPlatformPresets } from '@/utils/platformPresets';
+import { useState, useMemo, useEffect } from 'react';
+import { PLATFORM_PRESETS } from '@/utils/platformPresets';
 
 interface PlatformRatioSelectorProps {
-  onPresetSelect: (preset: PlatformPreset) => void;
-  currentPreset?: PlatformPreset;
+  onRatioSelect: (ratio: string, dimensions: {width: number, height: number}) => void;
+  currentRatio?: string;
 }
 
-export default function PlatformRatioSelector({ onPresetSelect, currentPreset }: PlatformRatioSelectorProps) {
-  const [selectedRatio, setSelectedRatio] = useState<string>('1:1');
+export default function PlatformRatioSelector({ onRatioSelect, currentRatio }: PlatformRatioSelectorProps) {
+  console.log('🎨 PLATFORMRATIOSELECTOR COMPONENT MOUNTED!');
+  console.log('🎨 Props received:', { onRatioSelect, currentRatio });
+  
+  const [selectedRatio, setSelectedRatio] = useState<string>(currentRatio || '1:1');
   const [isOpen, setIsOpen] = useState(false);
 
+  // Update selected ratio when currentRatio changes
+  useEffect(() => {
+    console.log('🎨 PlatformRatioSelector: currentRatio changed:', currentRatio);
+    console.log('🎨 PlatformRatioSelector: selectedRatio before update:', selectedRatio);
+    // Only update if currentRatio is different than currently selected
+    if (currentRatio && currentRatio !== selectedRatio) {
+      setSelectedRatio(currentRatio);
+      console.log('🎨 PlatformRatioSelector: Updated selectedRatio to:', currentRatio);
+    }
+  }, [currentRatio, selectedRatio]);
+
   const allRatios = useMemo(() => {
-    const presets = getPlatformPresets();
-    const ratioSet = new Set<string>();
-    presets.forEach(preset => ratioSet.add(preset.ratio));
-    return Array.from(ratioSet).sort();
+    const uniqueRatios = Array.from(new Set(PLATFORM_PRESETS.map(preset => preset.ratio)));
+    return uniqueRatios.sort();
   }, []);
 
   const ratioCategories = useMemo(() => {
@@ -41,10 +53,10 @@ export default function PlatformRatioSelector({ onPresetSelect, currentPreset }:
     return categories;
   }, [allRatios]);
 
+  // Remove platform presets filtering since we only use ratios now
   const availablePresets = useMemo(() => {
-    if (!selectedRatio) return [];
-    return getPlatformPresets().filter(preset => preset.ratio === selectedRatio);
-  }, [selectedRatio]);
+    return [];
+  }, []);
 
   const ratioCategoriesList = [
     { name: 'Landscape', ratios: ratioCategories.landscape },
@@ -55,60 +67,146 @@ export default function PlatformRatioSelector({ onPresetSelect, currentPreset }:
 
 
 
-  const handleRatioChange = (ratio: string) => {
+  const handleRatioSelect = (ratio: string) => {
+    console.log('🎯 PlatformRatioSelector: handleRatioSelect called with ratio:', ratio);
     setSelectedRatio(ratio);
+    
+    // Parse ratio to get width and height
+    const [widthStr, heightStr] = ratio.split(':');
+    const widthRatio = parseInt(widthStr);
+    const heightRatio = parseInt(heightStr);
+    
+    // Calculate dimensions based on ratio (use 1080 as base height for portrait, 1080 as base width for landscape)
+    let width: number;
+    let height: number;
+    
+    if (widthRatio === heightRatio) {
+      // Square format
+      width = 1080;
+      height = 1080;
+    } else if (widthRatio > heightRatio) {
+      // Landscape format - base width on 1080
+      width = 1080;
+      height = Math.round((1080 * heightRatio) / widthRatio);
+    } else {
+      // Portrait format - base height on 1080
+      height = 1080;
+      width = Math.round((1080 * widthRatio) / heightRatio);
+    }
+    
+    console.log('🎯 PlatformRatioSelector: calling onRatioSelect with ratio and dimensions:', ratio, {width, height});
+    console.log('🎯 PlatformRatioSelector: onRatioSelect function:', onRatioSelect);
+    onRatioSelect(ratio, {width, height});
   };
 
-  const handlePresetSelect = (preset: PlatformPreset) => {
-    onPresetSelect(preset);
-    setIsOpen(false);
-    setSelectedRatio(preset.ratio);
-  };
+
+
+  // Close modal when clicking outside or pressing Escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as Element;
+      if (isOpen && !target.closest('.ratio-modal') && !target.closest('.ratio-selector-button')) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.addEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'hidden';
+    }
+
+    console.log('🎯 PlatformRatioSelector RENDERING with currentRatio:', currentRatio);
+    console.log('🎯 PlatformRatioSelector onRatioSelect prop:', onRatioSelect);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
 
   return (
     <div className="relative">
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm min-w-0 max-w-sm"
-      >
-        <div className="w-4 h-4 bg-gradient-to-br from-blue-500 to-purple-500 rounded flex-shrink-0" />
-        <div className="min-w-0 flex-1 text-left">
-          <div className="text-sm font-medium text-gray-700 truncate">
-            {selectedRatio || 'Ratio'}
-          </div>
-        </div>
-        <svg className={`w-4 h-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
+      <div className="flex items-center gap-2">
+        <div className="text-sm font-medium text-gray-700">Format:</div>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ratio-selector-button"
+        >
+          <span className="text-sm">
+            {selectedRatio || 'Select Ratio'}
+          </span>
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-hidden">
-          <div className="p-3">
-            {/* 比例选择 */}
-            <div className="space-y-2">
-              {ratioCategoriesList.map((category) => (
-                category.ratios.length > 0 && (
-                  <div key={category.name}>
-                    <div className="text-xs font-medium text-gray-600 mb-1">{category.name}</div>
-                    <div className="flex flex-wrap gap-1">
-                      {category.ratios.map((ratio) => (
-                        <button
-                          key={ratio}
-                          onClick={() => handleRatioChange(ratio)}
-                          className={`px-2 py-1 text-xs rounded-md transition-colors min-w-0 ${
-                            selectedRatio === ratio
-                              ? 'bg-green-100 text-green-700 border border-green-300'
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                          }`}
-                        >
-                          <span className="block truncate">{ratio}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )
-              ))}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 ratio-modal">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-hidden">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Select Ratio</h2>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 overflow-y-auto max-h-[calc(80vh-120px)]">
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Select Ratio</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {allRatios.map((ratio) => (
+                    <button
+                      key={ratio}
+                      onClick={() => handleRatioSelect(ratio)}
+                      className={`p-3 rounded-lg border-2 transition-all ${
+                        selectedRatio === ratio
+                          ? 'border-blue-500 bg-blue-50 text-blue-700'
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="text-sm font-medium">{ratio}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {ratio === '1:1' && 'Square'}
+                        {ratio === '4:5' && 'Portrait'}
+                        {ratio === '9:16' && 'Story'}
+                        {ratio === '16:9' && 'Landscape'}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Done
+              </button>
             </div>
           </div>
         </div>

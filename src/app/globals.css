@@ -456,6 +456,35 @@ a {
   margin: 16px;
   margin-bottom: 12px;
   position: relative;
+  max-width: 100%;
+  height: auto;
+}
+
+.neu-image-container img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* React Flow Node Responsive Sizing */
+.react-flow__node {
+  min-width: 300px;
+  max-width: 500px;
+  width: auto !important;
+  height: auto !important;
+}
+
+.react-flow__node .neu-image-container {
+  width: 100%;
+  max-width: 300px;
+  margin: 16px auto;
+}
+
+/* Ensure proper aspect ratio handling */
+.react-flow__node img {
+  max-width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* Content Container */

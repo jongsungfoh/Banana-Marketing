@@ -352,7 +352,26 @@ Copyright (c) 2024 The Pocket Company
 
 ## 📝 Recent Updates
 
-### v1.1.0 - Latest Changes
+### v1.2.0 - Latest Changes (Aspect Ratio Fixes)
+- **Image Generation Improvements**:
+  - Fixed aspect ratio validation and correction for generated images
+  - Added automatic image cropping when aspect ratio doesn't match requested size
+  - Enhanced prompt engineering with explicit aspect ratio requirements
+  - Added detailed logging for aspect ratio validation process
+
+- **UI/UX Enhancements**:
+  - Fixed image container sizing to properly adapt to actual image dimensions
+  - Added responsive image containers that maintain aspect ratios
+  - Improved React Flow node sizing for better image display
+  - Enhanced mobile responsiveness for image containers
+
+- **Technical Improvements**:
+  - Added Sharp library integration for image processing
+  - Implemented aspect ratio validation with 5% tolerance
+  - Added automatic image cropping with center positioning
+  - Enhanced error handling for image generation failures
+
+### v1.1.0 - Previous Changes
 - **UI Improvements**:
   - Updated branding from "Banana Editor - Open Source" to "Banana Marketing - Lush Cloud AI"
   - Simplified toolbar button texts ("Add Product" → "Add", "Merge Images" → "Merge")
