@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     
     // 使用 Gemini 2.5 Flash Image Preview 进行圖片生成
     const model = genAI.getGenerativeModel({ 
-      model: "gemini-2.5-flash-image-preview"
+      model: "gemini-2.5-flash-image"
     });
 
     const { concept, prompt } = prompt_data;
