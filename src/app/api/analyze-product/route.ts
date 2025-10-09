@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import axios from 'axios';
+import { getCurrentGeminiModel } from '@/utils/getCurrentGeminiModel';
 
 interface CreativeConcept {
   name: string;
@@ -44,8 +45,9 @@ export async function POST(request: NextRequest) {
     // 使用用户提供的 API Key
     console.log('🤖 Initializing Gemini model...');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-    console.log('✅ Gemini model initialized');
+    const currentModel = getCurrentGeminiModel();
+    const model = genAI.getGenerativeModel({ model: currentModel.name });
+    console.log(`✅ Gemini model initialized: ${currentModel}`);
 
     let base64Image: string;
     let mimeType: string;

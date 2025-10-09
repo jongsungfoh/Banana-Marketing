@@ -134,16 +134,16 @@ export default function PlatformRatioSelector({ onRatioSelect, currentRatio }: P
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-2">
-        <div className="text-sm font-medium text-gray-700">Format:</div>
+      <div className="flex items-center gap-1 sm:gap-2">
+        <div className="text-xs sm:text-sm font-medium text-gray-700">Format:</div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ratio-selector-button"
+          className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1 sm:py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ratio-selector-button"
         >
-          <span className="text-sm">
+          <span className="text-xs sm:text-sm">
             {selectedRatio || 'Select Ratio'}
           </span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>

@@ -79,7 +79,7 @@ function HomeContent() {
     const newCount = bananaClickCount + 1;
     setBananaClickCount(newCount);
     
-    if (newCount >= 5) {
+    if (newCount >= 20) {
       setShowKnowledgeGraphButton(true);
       setBananaClickCount(0);
     }
@@ -169,7 +169,7 @@ function HomeContent() {
       {/* API Key Form Overlay - Top layer above upload field */}
       {showApiKeyForm && !apiKey && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full mx-4 text-center border border-gray-200 relative">
+          <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-6 md:p-8 max-w-xs sm:max-w-sm md:max-w-md w-full mx-2 sm:mx-4 text-center border border-gray-200 relative">
             <div className="mb-6">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -186,7 +186,7 @@ function HomeContent() {
               <input
                 type="text"
                 placeholder="Enter your Gemini API key"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-mono text-sm"
+                className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center font-mono text-xs sm:text-sm"
                 onKeyPress={(e) => {
                   if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                     localStorage.setItem('gemini_api_key', e.currentTarget.value.trim());
@@ -202,7 +202,7 @@ function HomeContent() {
                     window.location.reload();
                   }
                 }}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-medium transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 text-sm sm:text-base"
               >
                 Start Creating
               </button>

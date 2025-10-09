@@ -34,8 +34,9 @@ Visit http://localhost:3003
 - ✅ **Save/Load Projects** *(Save to .banana files, load from .banana/.json)*
 - ✅ **Bilingual Support (EN/ZH)**
 - ✅ **Fully Local** *(Official Version provides cloud storage)*
-- ✅ **Hidden Feature: KFC Knowledge Graph** *(Click banana icon 5 times to unlock)*
+- ✅ **Hidden Feature: KFC Knowledge Graph** *(Click banana icon 20 times to unlock)*
 - ✅ **Mobile Responsive Toolbar** *(Horizontal scrolling for mobile devices)*
+- ✅ **Responsive Design** *(Optimized for 400px+ screens with proper alignment)*
 - ✅ **API Key Management** *(Secure API key storage and management)*
 
 ## 📝 How to Get Gemini API Key
@@ -266,7 +267,7 @@ npm run dev
 3. 点击任何节点将其新增为创意概念
 
 ### 8. 隐藏功能 - KFC 知识图谱按钮
-**秘密解锁**：点击顶部香蕉图标 5 次，工具栏中就会显示 KFC 知识图谱按钮！
+**秘密解锁**：点击顶部香蕉图标 10 次，工具栏中就会显示 KFC 知识图谱按钮！
 
 ### 7. 节点操作
 - **拖拽**：移动节点位置

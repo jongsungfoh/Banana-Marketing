@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LanguageIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { geminiModelSwitcher, showModelSwitchNotification } from '@/utils/geminiModelSwitcher'
 
 interface HeaderProps {
   onBananaClick?: () => void;
@@ -30,6 +31,7 @@ export default function Header({
   const [currentLanguage, setCurrentLanguage] = useState<'en-us' | 'zh-cn'>('en-us')
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
+  const [currentModel, setCurrentModel] = useState(geminiModelSwitcher.getCurrentModel())
 
   // 从 localStorage 读取 API Key
   useEffect(() => {
@@ -44,6 +46,11 @@ export default function Header({
         setCurrentLanguage(savedLanguage);
       }
 
+      // Subscribe to model changes
+      const unsubscribe = geminiModelSwitcher.subscribe((model) => {
+        setCurrentModel(model);
+      });
+
       // Listen for API Key modal events from toolbar
       const handleShowApiKeyModal = () => {
         setShowApiKey(true);
@@ -53,6 +60,7 @@ export default function Header({
       
       return () => {
         window.removeEventListener('showApiKeyModal', handleShowApiKeyModal);
+        unsubscribe();
       };
     }
   }, []);
@@ -77,6 +85,22 @@ export default function Header({
     }
   }
 
+  // 模型切换
+  const handleModelSwitch = () => {
+    const newModel = geminiModelSwitcher.switchToNextModel();
+    showModelSwitchNotification(newModel);
+  }
+
+  // 处理香蕉点击（结合KFC功能和模型切换）
+  const handleBananaClickCombined = () => {
+    // 调用原始的KFC功能
+    if (onBananaClick) {
+      onBananaClick();
+    }
+    // 同时切换模型
+    handleModelSwitch();
+  }
+
   const t = {
     'en-us': {
       apiKeyPlaceholder: 'Enter your Gemini API Key',
@@ -99,28 +123,29 @@ export default function Header({
   return (
     <header className="glass sticky top-0 z-50 border-b border-white/20">
       <div className="w-full px-6">
-        <div className="flex items-center justify-between h-16 overflow-x-auto min-w-max scrollbar-hide">
+        <div className="flex items-center justify-between h-16 max-w-7xl mx-auto px-2 sm:px-4 md:px-6 lg:px-8 overflow-x-auto min-w-max scrollbar-hide">
           {/* Left Side - Logo */}
           <motion.div 
-            className="flex items-center space-x-3 cursor-pointer min-w-max"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            onClick={onBananaClick}
-          >
-            <div className="relative">
-              <span className="text-3xl animate-float select-none">🍌</span>
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-banana-400 to-banana-500 rounded-full animate-pulse"></div>
-            </div>
-            <div className="relative max-md:hidden">
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold gradient-text">Banana Marketing</h1>
+              className="flex items-center space-x-3 cursor-pointer min-w-max"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5 }}
+              onClick={handleBananaClickCombined}
+              title={`Current model: ${currentModel} (click to switch)`}
+            >
+              <div className="relative">
+                <span className="text-3xl animate-float select-none">🍌</span>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-banana-400 to-banana-500 rounded-full animate-pulse"></div>
               </div>
-              <p className="text-xs text-gray-500 opacity-30 mt-1">
-                Powered by The Pocket Company
-              </p>
-            </div>
-          </motion.div>
+              <div className="relative max-md:hidden">
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl font-bold gradient-text">Banana Marketing</h1>
+                </div>
+                <p className="text-xs text-gray-500 opacity-30 mt-1">
+                  Powered by The Pocket Company
+                </p>
+              </div>
+            </motion.div>
 
           {/* Desktop Navigation - Always show desktop layout */}
           <div className="flex items-center gap-3 min-w-max">
@@ -192,7 +217,7 @@ export default function Header({
                 value={apiKey}
                 onChange={(e) => handleApiKeyChange(e.target.value)}
                 placeholder={t[currentLanguage].apiKeyPlaceholder}
-                className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500 focus:border-transparent w-80 pr-16"
+                className="px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-banana-500 focus:border-transparent w-48 sm:w-64 md:w-80 pr-16"
               />
               <button
                 onClick={() => setIsApiKeyVisible(!isApiKeyVisible)}
@@ -234,6 +259,16 @@ export default function Header({
                 {/* Mobile Control Buttons */}
                 {showMobileControls && (
                   <div className="space-y-2 pb-3 border-b border-gray-100">
+                    <button
+                      onClick={() => {
+                        handleModelSwitch()
+                        setIsMobileMenuOpen(false)
+                      }}
+                      className="w-full px-4 py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-lg hover:from-yellow-500 hover:to-orange-500 transition-all duration-200 font-medium shadow-lg"
+                      title={`Current model: ${currentModel} (click to switch)`}
+                    >
+                      🍌 Banana Marketing
+                    </button>
                     <button
                       onClick={() => {
                         onLoadClick?.()

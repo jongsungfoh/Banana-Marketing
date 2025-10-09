@@ -722,3 +722,38 @@ a {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Responsive fixes for 400px width */
+@media (max-width: 400px) {
+  /* Ensure proper text alignment for small screens */
+  .text-right {
+    text-align: right !important;
+  }
+  
+  .text-left {
+    text-align: left !important;
+  }
+  
+  .text-center {
+    text-align: center !important;
+  }
+  
+  /* Ensure inputs don't overflow */
+  input[type="text"],
+  input[type="password"] {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Fix for header elements */
+  header .flex {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  
+  /* Ensure modal content is properly aligned */
+  .fixed.inset-0 .bg-white {
+    margin: 0.5rem;
+    max-height: calc(100vh - 1rem);
+  }
+}

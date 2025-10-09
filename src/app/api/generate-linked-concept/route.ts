@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { mergeImages } from '@/utils/imageMerge';
+import { getCurrentGeminiModel } from '@/utils/getCurrentGeminiModel';
 
 async function fetchImageAsBase64(imageUrl: string): Promise<string> {
   try {
@@ -63,7 +64,9 @@ export async function POST(request: NextRequest) {
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(api_key);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const currentModel = getCurrentGeminiModel();
+    const model = genAI.getGenerativeModel({ model: currentModel.name });
+    console.log(`✅ Gemini model initialized: ${currentModel}`);
 
     // Fetch and convert all product images to base64, then merge them
     console.log('📸 Fetching and merging product images...');
